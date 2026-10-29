@@ -1,0 +1,16 @@
+
+===== full (2007-01-01 ->) =====
+                   CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions     adds  on_margin  leveraged
+default           0.154        -0.261   0.930   17.168         0.788   4959.000 2682.000      0.757      0.283
+strict            0.021        -0.089   0.543    1.496         0.127   1020.000    0.000      0.000      0.000
+no_leveraged_etfs 0.118        -0.196   0.881    9.139         0.682   5058.000 2706.000      0.000      0.000
+no_margin         0.082        -0.149   0.881    4.761         0.440   3581.000  939.000      0.000      0.000
+SPY buy & hold    0.089        -0.565   0.535    5.444           NaN        NaN      NaN        NaN        NaN
+
+===== last2y (2024-11-01 ->) =====
+                   CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions    adds  on_margin  leveraged
+default           0.276        -0.177   1.218    1.623         1.034    939.000 531.000      0.759      0.318
+strict            0.006        -0.071   0.177    1.013         0.118    139.000   0.000      0.000      0.000
+no_leveraged_etfs 0.146        -0.133   0.903    1.311         0.844   1038.000 562.000      0.000      0.000
+no_margin         0.068        -0.103   0.637    1.139         0.524    722.000 205.000      0.000      0.000
+SPY buy & hold    0.162        -0.190   0.998    1.348           NaN        NaN     NaN        NaN        NaN

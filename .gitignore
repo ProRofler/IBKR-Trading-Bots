@@ -1,0 +1,14 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Secrets and local settings
+.env
+
+# Downloaded bars (re-create with `python -m common.data`); keep the small reference file
+data/*
+!data/reference.json
+
+# Backtest outputs (large, re-create by running the backtests)
+*/results/

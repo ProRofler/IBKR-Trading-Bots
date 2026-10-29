@@ -1,0 +1,24 @@
+﻿
+===== full (2007-01-01 ->) =====
+                   CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions     adds  on_margin  leveraged
+default           0.152        -0.283   0.899   16.488         0.799   5157.000 2779.000      0.755      0.288
+strict            0.025        -0.093   0.655    1.645         0.129   1027.000    0.000      0.000      0.000
+no_leveraged_etfs 0.121        -0.216   0.897    9.534         0.687   5123.000 2767.000      0.000      0.000
+no_margin         0.099        -0.149   1.035    6.467         0.455   3529.000  955.000      0.000      0.000
+SPY buy & hold    0.089        -0.565   0.535    5.444           NaN        NaN      NaN        NaN        NaN
+
+===== since2022 (2022-01-01 ->) =====
+                   CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions     adds  on_margin  leveraged
+default           0.260        -0.178   1.097    3.035         1.147   2291.000 1527.000      0.841      0.356
+strict            0.033        -0.061   0.774    1.171         0.138    312.000    0.000      0.000      0.000
+no_leveraged_etfs 0.189        -0.126   1.097    2.298         0.917   2232.000 1524.000      0.000      0.000
+no_margin         0.123        -0.103   1.110    1.744         0.544   1479.000  451.000      0.000      0.000
+SPY buy & hold    0.104        -0.254   0.662    1.611           NaN        NaN      NaN        NaN        NaN
+
+===== last2y (2024-11-01 ->) =====
+                   CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions    adds  on_margin  leveraged
+default           0.384        -0.178   1.459    1.907         1.136    960.000 623.000      0.837      0.362
+strict            0.041        -0.046   0.943    1.083         0.143    147.000   0.000      0.000      0.000
+no_leveraged_etfs 0.251        -0.126   1.416    1.559         0.884    958.000 612.000      0.000      0.000
+no_margin         0.173        -0.058   1.674    1.372         0.523    599.000 184.000      0.000      0.000
+SPY buy & hold    0.162        -0.190   0.998    1.348           NaN        NaN     NaN        NaN        NaN

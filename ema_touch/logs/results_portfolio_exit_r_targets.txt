@@ -1,0 +1,28 @@
+
+##### Portfolio: full history, max 0 at risk (2007-01-03 -> 2026-10-27) #####
+                CAGR  max_drawdown  sharpe  final_x
+strategy       0.026        -0.317   0.316    1.658
+SPY buy & hold 0.089        -0.565   0.535    5.444
+
+Decisions: {'skip_adding_rule': 6741, 'skip_symbol_held': 1852, 'enter': 1023}
+Positions: 1023, at 10% size: 27%, on margin: 0%, leveraged ETF: 0%
+By timeframe: {'30m': 28, '1h': 31, '4h': 171, '1d': 565, '1w': 228}
+
+Yearly returns:
+end       2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  2018  2019  2020  2021  2022  2023  2024  2025  2026
+strategy   -1%   -4%   +8%  +27%  -11%   +1%  +11%   +1%   +1%   -0%   +7%   +1%  +13%  +17%  +20%  -26%   -0%   -1%   +1%   +1%
+SPY        +4%  -38%  +23%  +13%   -0%  +14%  +30%  +11%   -1%  +10%  +19%   -6%  +29%  +16%  +27%  -19%  +24%  +23%  +16%  +13%
+
+##### Portfolio: all timeframes available, max 0 at risk (2024-11-01 -> 2026-10-27) #####
+                CAGR  max_drawdown  sharpe  final_x
+strategy       0.034        -0.043   0.635    1.068
+SPY buy & hold 0.162        -0.190   0.998    1.348
+
+Decisions: {'skip_adding_rule': 2270, 'skip_symbol_held': 447, 'enter': 192}
+Positions: 192, at 10% size: 39%, on margin: 0%, leveraged ETF: 0%
+By timeframe: {'30m': 35, '1h': 22, '4h': 62, '1d': 53, '1w': 20}
+
+Yearly returns:
+end       2024  2025  2026
+strategy   +1%   +4%   +1%
+SPY        +3%  +16%  +13%

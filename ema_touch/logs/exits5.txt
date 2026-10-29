@@ -1,0 +1,13 @@
+﻿=== Exit variants (entry rules on, after costs) ===
+                trades  win_rate  avg_r  avg_r_cap10  profit_factor  median_bars  kept_of_peak  reached_be  total_r_cap10
+half3R_trail 67788.000     0.215  0.144        0.109          1.352        4.000         0.427       0.698       7393.523
+whole_at_2R  73659.000     0.241  0.105        0.088          1.253        4.000         0.673       0.649       6498.692
+whole_at_3R  72039.000     0.216  0.120        0.102          1.287        4.000         0.580       0.676       7362.356
+whole_at_4R  71028.000     0.206  0.128        0.109          1.304        4.000         0.509       0.685       7720.373
+
+=== Avg R (cap 10) by timeframe ===
+tf             30m    1h    4h    1d    1w
+half3R_trail 0.081 0.195 0.084 0.072 0.251
+whole_at_2R  0.032 0.114 0.084 0.072 0.251
+whole_at_3R  0.067 0.159 0.084 0.072 0.251
+whole_at_4R  0.097 0.171 0.084 0.072 0.251

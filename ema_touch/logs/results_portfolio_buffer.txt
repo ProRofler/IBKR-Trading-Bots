@@ -1,0 +1,46 @@
+﻿
+##### Portfolio: buffer1_pyramid, full (2007-01-03 -> 2026-10-27) #####
+                CAGR  max_drawdown  sharpe  final_x
+strategy       0.027        -0.168   0.404    1.693
+SPY buy & hold 0.089        -0.565   0.535    5.444
+
+Decisions: {'skip_adding_rule': 4263, 'enter': 2028, 'skip_symbol_held': 655, 'add': 471}
+Positions: 2499, at 10% size: 22%, on margin: 18%, leveraged ETF: 6%
+By timeframe: {'30m': 77, '1h': 72, '4h': 470, '1d': 1424, '1w': 456}
+
+Yearly returns:
+end       2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  2018  2019  2020  2021  2022  2023  2024  2025  2026
+strategy   -2%   -5%   +2%   +3%   +6%   -1%   +6%   -3%   -2%   +5%   +5%   +2%   +2%  +10%  +18%  -10%   +0%  +10%  +10%   +0%
+SPY        +4%  -38%  +23%  +13%   -0%  +14%  +30%  +11%   -1%  +10%  +19%   -6%  +29%  +16%  +27%  -19%  +24%  +23%  +16%  +13%
+
+===== full (2007-01-01 ->) =====
+                 CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions    adds  on_margin  leveraged
+strict          0.010        -0.110   0.303    1.221         0.120    993.000   0.000      0.000      0.000
+strict_pyramid  0.012        -0.090   0.353    1.274         0.124    906.000  76.000      0.000      0.000
+buffer1         0.013        -0.192   0.257    1.292         0.217   2110.000   0.000      0.046      0.013
+buffer1_pyramid 0.027        -0.168   0.404    1.693         0.257   2028.000 471.000      0.180      0.061
+buffer2_pyramid 0.043        -0.213   0.507    2.283         0.322   2411.000 662.000      0.280      0.092
+SPY buy & hold  0.089        -0.565   0.535    5.444           NaN        NaN     NaN        NaN        NaN
+
+##### Portfolio: buffer1_pyramid, last2y (2024-11-01 -> 2026-10-27) #####
+                CAGR  max_drawdown  sharpe  final_x
+strategy       0.063        -0.050   0.961    1.128
+SPY buy & hold 0.162        -0.190   0.998    1.348
+
+Decisions: {'skip_adding_rule': 1521, 'enter': 339, 'skip_symbol_held': 177, 'add': 73}
+Positions: 412, at 10% size: 31%, on margin: 8%, leveraged ETF: 3%
+By timeframe: {'30m': 79, '1h': 46, '4h': 157, '1d': 107, '1w': 23}
+
+Yearly returns:
+end       2024  2025  2026
+strategy   +2%  +10%   +0%
+SPY        +3%  +16%  +13%
+
+===== last2y (2024-11-01 ->) =====
+                 CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions    adds  on_margin  leveraged
+strict          0.004        -0.042   0.148    1.009         0.151    203.000   0.000      0.000      0.000
+strict_pyramid  0.020        -0.040   0.518    1.040         0.155    183.000  20.000      0.000      0.000
+buffer1         0.016        -0.050   0.317    1.032         0.251    451.000   0.000      0.040      0.018
+buffer1_pyramid 0.063        -0.050   0.961    1.128         0.256    339.000  73.000      0.078      0.032
+buffer2_pyramid 0.117        -0.094   1.195    1.246         0.316    387.000 104.000      0.202      0.077
+SPY buy & hold  0.162        -0.190   0.998    1.348           NaN        NaN     NaN        NaN        NaN

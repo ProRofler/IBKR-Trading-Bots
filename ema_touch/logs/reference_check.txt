@@ -1,0 +1,34 @@
+﻿SPY    -> SSO    2x PROSHARES ULTRA S&P500
+QQQ    -> QLD    2x PROSHARES ULTRA QQQ
+DIA    -> DDM    2x PROSHARES ULTRA DOW30
+AAPL   -> AAPU   2x DIREXION DAILY AAPL BULL 2X
+MSFT   -> MSFU   2x DIREXION DAILY MSFT BULL 2X
+NVDA   -> NVDU   2x DIREXION DAILY NVDA BULL 2X
+AMZN   -> AMZU   2x DIRE DLY AMZN BUL 2X ETF-USD
+GOOGL  -> GGLL   2x DIREXION DAILY GOOGL BULL 2X
+META   -> METU   2x DIREX DLY META BUL 2X ETF-US
+TSLA   -> TSLL   2x DIRX DLY TSLA BUL 2X ETF-AUI
+PLTR   -> PLTU   2x DIRE DLY PLTR BUL 2X ETF-USD
+AVGO   -> AVL    2x DIREX DAI AV BULL 2X ETF-USD
+AMD    -> AMDL   2x GRANITESHARES 2XLONG AMD ETF
+LLY    -> ELIL   2x DIREXION DAILY LLY BULL 2X E
+MU     -> MUU    2x DIREXION DAILY MU BULL 2X ET
+TSM    -> TSMX   2x DIRXN DLY TSM BULL 2X ETF-UI
+COIN   -> CONL   2x GRANITESH 2X LNG COIN ETF-US
+MSTR   -> MSTU   2x T-REX 2X LONG MSTR DT ETF
+CRWD   -> CRWL   2x GRANITESHARES 2X L CRWD ETF
+PANW   -> PALU   2x DIREXION DAILY PANW BULL 2X
+ARM    -> ARMG   2x LEVERAGE SHARES 2X ARM
+HOOD   -> HOOX   2x DEFIANCE D TAR 2X L HOOD ETF
+APP    -> APPX   2x TRADR 2X LONG APP DAILY ETF
+RKLB   -> RKLX   2x DEFI DAILY TA 2X L RKLB ETF
+SHOP   -> SHPU   2x DIRXION DLY SHOP BULL 2X ETF
+SMH    -> USD    2x PROSHARES ULTRA SEMICONDUCT
+XLK    -> ROM    2x PROSHARES ULTRA TECHNOLOGY
+XLF    -> UYG    2x PROSHARES ULTRA FINANCIALS
+XLI    -> UXI    2x PROSHARES ULTRA INDUSTRIALS
+GLD    -> UGL    2x PROSHARES ULTRA GOLD
+SLV    -> AGQ    2x PROSHARES ULTRA SILVER
+GDX    -> NUGT   2x DIRXN DLY GM INDX B2X ETF-UI
+
+Sectors: {'SPY': '', 'QQQ': '', 'DIA': '', 'AAPL': 'Technology', 'MSFT': 'Technology', 'NVDA': 'Technology', 'AVGO': 'Technology', 'AMD': 'Technology', 'ORCL': 'Technology', 'CRM': 'Technology', 'ADBE': 'Technology', 'PLTR': 'Technology', 'GOOGL': 'Communications', 'META': 'Communications', 'NFLX': 'Communications', 'AMZN': 'Communications', 'TSLA': 'Consumer, Cyclical', 'HD': 'Consumer, Cyclical', 'COST': 'Consumer, Cyclical', 'WMT': 'Consumer, Cyclical', 'KO': 'Consumer, Non-cyclical', 'PEP': 'Consumer, Non-cyclical', 'PG': 'Consumer, Non-cyclical', 'JPM': 'Financial', 'BAC': 'Financial', 'V': 'Financial', 'MA': 'Financial', 'LLY': 'Consumer, Non-cyclical', 'UNH': 'Consumer, Non-cyclical', 'JNJ': 'Consumer, Non-cyclical', 'MRK': 'Consumer, Non-cyclical', 'ABBV': 'Consumer, Non-cyclical', 'XOM': 'Energy', 'CVX': 'Energy', 'MU': 'Technology', 'LRCX': 'Technology', 'KLAC': 'Technology', 'AMAT': 'Technology', 'TSM': 'Technology', 'ARM': 'Technology', 'ANET': 'Communications', 'VRT': 'Industrial', 'APP': 'Communications', 'CRWD': 'Technology', 'PANW': 'Communications', 'FICO': 'Technology', 'SHOP': 'Communications', 'MELI': 'Communications', 'SPOT': 'Communications', 'UBER': 'Communications', 'DASH': 'Communications', 'RDDT': 'Communications', 'NBIS': 'Technology', 'CRWV': 'Technology', 'HOOD': 'Communications', 'COIN': 'Financial', 'MSTR': 'Technology', 'NU': 'Financial', 'SOFI': 'Financial', 'KKR': 'Financial', 'APO': 'Financial', 'GS': 'Financial', 'RKLB': 'Industrial', 'ASTS': 'Communications', 'AXON': 'Industrial', 'GE': 'Industrial', 'GEV': 'Industrial', 'HWM': 'Industrial', 'ETN': 'Industrial', 'PWR': 'Consumer, Non-cyclical', 'TT': 'Industrial', 'CAT': 'Industrial', 'URI': 'Consumer, Non-cyclical', 'CTAS': 'Consumer, Non-cyclical', 'CEG': 'Utilities', 'VST': 'Utilities', 'MNST': 'Consumer, Non-cyclical', 'TJX': 'Consumer, Cyclical', 'RCL': 'Consumer, Cyclical', 'BKNG': 'Communications', 'ORLY': 'Consumer, Cyclical', 'ISRG': 'Consumer, Non-cyclical', 'MCK': 'Consumer, Non-cyclical', 'SMH': '', 'SOXX': '', 'XLK': '', 'XLI': '', 'XLF': '', 'ITA': '', 'URA': '', 'GLD': '', 'SLV': '', 'GDX': '', 'MAGS': '', 'DRAM': '', 'IBIT': ''}

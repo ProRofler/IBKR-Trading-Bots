@@ -1,0 +1,66 @@
+﻿
+##### Portfolio: default, full (2007-01-03 -> 2026-10-27) #####
+                CAGR  max_drawdown  sharpe  final_x
+strategy       0.198        -0.380   0.956   35.741
+SPY buy & hold 0.089        -0.565   0.535    5.444
+
+Decisions: {'skip_margin': 34337, 'skip_adding_rule': 15218, 'skip_symbol_held': 9016, 'enter': 7514, 'add': 1703}
+Positions: 9217, at 10% size: 17%, on margin: 85%, leveraged ETF: 22%
+By timeframe: {'30m': 94, '1h': 299, '4h': 1364, '1d': 5569, '1w': 1891}
+
+Yearly returns:
+end       2007  2008  2009  2010  2011  2012  2013  2014  2015  2016  2017  2018  2019  2020  2021  2022  2023  2024  2025  2026
+strategy   -1%   -9%  +25%  +14%   -2%   -6% +113%  +15%  -11%  +14%  +48%   +1%  +33%  +38%  +55%  -32%  +89%  +69%  +13%  +16%
+SPY        +4%  -38%  +23%  +13%   -0%  +14%  +30%  +11%   -1%  +10%  +19%   -6%  +29%  +16%  +27%  -19%  +24%  +23%  +16%  +13%
+
+===== full (2007-01-01 ->) =====
+                   CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions     adds  on_margin  leveraged
+default           0.198        -0.380   0.956   35.741         0.931   7514.000 1703.000      0.847      0.220
+strict            0.036        -0.126   0.728    2.023         0.153   1027.000    0.000      0.000      0.000
+no_leveraged_etfs 0.153        -0.319   0.877   16.762         0.836   7525.000 1652.000      0.000      0.000
+no_margin         0.104        -0.217   0.969    7.162         0.466   3837.000  426.000      0.000      0.000
+SPY buy & hold    0.089        -0.565   0.535    5.444           NaN        NaN      NaN        NaN        NaN
+
+##### Portfolio: default, since2022 (2022-01-03 -> 2026-10-27) #####
+                CAGR  max_drawdown  sharpe  final_x
+strategy       0.227        -0.322   0.867    2.680
+SPY buy & hold 0.104        -0.254   0.662    1.611
+
+Decisions: {'skip_margin': 26409, 'skip_adding_rule': 11397, 'skip_symbol_held': 5940, 'enter': 3008, 'add': 672}
+Positions: 3680, at 10% size: 14%, on margin: 87%, leveraged ETF: 25%
+By timeframe: {'30m': 95, '1h': 289, '4h': 1276, '1d': 1491, '1w': 529}
+
+Yearly returns:
+end       2022  2023  2024  2025  2026
+strategy  -22%  +52%  +72%  +13%  +16%
+SPY       -20%  +24%  +23%  +16%  +13%
+
+===== since2022 (2022-01-01 ->) =====
+                   CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions    adds  on_margin  leveraged
+default           0.227        -0.322   0.867    2.680         1.054   3008.000 672.000      0.867      0.253
+strict            0.035        -0.065   0.619    1.181         0.160    270.000   0.000      0.000      0.000
+no_leveraged_etfs 0.230        -0.247   1.023    2.711         0.947   2956.000 668.000      0.000      0.000
+no_margin         0.122        -0.154   0.918    1.742         0.518   1304.000 142.000      0.000      0.000
+SPY buy & hold    0.104        -0.254   0.662    1.611           NaN        NaN     NaN        NaN        NaN
+
+##### Portfolio: default, last2y (2024-11-01 -> 2026-10-27) #####
+                CAGR  max_drawdown  sharpe  final_x
+strategy       0.365        -0.278   1.275    1.856
+SPY buy & hold 0.162        -0.190   0.998    1.348
+
+Decisions: {'skip_margin': 14093, 'skip_adding_rule': 9418, 'skip_symbol_held': 2746, 'enter': 978, 'add': 225}
+Positions: 1203, at 10% size: 15%, on margin: 87%, leveraged ETF: 21%
+By timeframe: {'30m': 51, '1h': 63, '4h': 300, '1d': 529, '1w': 260}
+
+Yearly returns:
+end       2024  2025  2026
+strategy   +0%  +63%  +14%
+SPY        +3%  +16%  +13%
+
+===== last2y (2024-11-01 ->) =====
+                   CAGR  max_drawdown  sharpe  final_x  avg_exposure  positions    adds  on_margin  leveraged
+default           0.365        -0.278   1.275    1.856         0.942    978.000 225.000      0.873      0.209
+strict            0.053        -0.064   0.741    1.108         0.149    122.000   0.000      0.000      0.000
+no_leveraged_etfs 0.207        -0.237   0.949    1.453         0.863   1053.000 242.000      0.000      0.000
+no_margin         0.175        -0.104   1.190    1.376         0.498    496.000  49.000      0.000      0.000
+SPY buy & hold    0.162        -0.190   0.998    1.348           NaN        NaN     NaN        NaN        NaN

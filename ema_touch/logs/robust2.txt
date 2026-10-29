@@ -1,0 +1,36 @@
+﻿
+===== full =====
+                                      CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                     
+run10 exits, all                         0.161        0.208     0.235        -0.368       -0.430          0.927     1.039    20
+run10, all, quality first                0.199        0.218     0.239        -0.383       -0.417          0.982     0.984    20
+run10, all, no 10 EMA                    0.168        0.204     0.230        -0.389       -0.495          0.917     1.000    20
+run10, all, no 10/20 EMA                 0.141        0.161     0.173        -0.348       -0.413          0.820     0.868    20
+run10, original, quality first           0.148        0.154     0.165        -0.388       -0.411          0.840     0.911    20
+run10, 75% subsets, quality first        0.173        0.190     0.232        -0.386       -0.441          0.892     0.955    20
+run10, all, quality first, no lev        0.182        0.195     0.206        -0.326       -0.349          0.980     0.891    20
+run10, all, quality first, no margin     0.119        0.127     0.142        -0.196       -0.222          1.005     0.522    20
+
+===== since2022 =====
+                                      CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                     
+run10 exits, all                         0.290        0.376     0.478        -0.294       -0.376          1.189     1.160    20
+run10, all, quality first                0.333        0.403     0.453        -0.328       -0.367          1.286     1.075    20
+run10, all, no 10 EMA                    0.268        0.321     0.442        -0.292       -0.337          1.056     1.157    20
+run10, all, no 10/20 EMA                 0.185        0.273     0.384        -0.307       -0.375          0.967     1.141    20
+run10, original, quality first           0.222        0.242     0.264        -0.240       -0.275          1.023     1.176    20
+run10, 75% subsets, quality first        0.291        0.386     0.459        -0.320       -0.358          1.225     1.106    20
+run10, all, quality first, no lev        0.325        0.362     0.403        -0.307       -0.335          1.287     0.959    20
+run10, all, quality first, no margin     0.138        0.160     0.192        -0.189       -0.250          1.020     0.550    20
+
+===== last2y =====
+                                      CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                     
+run10 exits, all                         0.161        0.312     0.501        -0.288       -0.387          1.036     1.105    20
+run10, all, quality first                0.346        0.379     0.403        -0.248       -0.281          1.250     0.893    20
+run10, all, no 10 EMA                    0.248        0.313     0.485        -0.273       -0.320          0.996     1.084    20
+run10, all, no 10/20 EMA                 0.062        0.167     0.284        -0.288       -0.370          0.714     1.090    20
+run10, original, quality first           0.259        0.304     0.345        -0.142       -0.207          1.316     1.197    20
+run10, 75% subsets, quality first        0.160        0.290     0.379        -0.257       -0.359          1.017     1.049    20
+run10, all, quality first, no lev        0.154        0.324     0.361        -0.233       -0.266          1.189     0.837    20
+run10, all, quality first, no margin     0.107        0.148     0.194        -0.147       -0.183          0.983     0.509    20

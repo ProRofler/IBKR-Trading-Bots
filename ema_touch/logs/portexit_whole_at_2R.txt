@@ -1,0 +1,7 @@
+       variant  universe     window  CAGR  max_drawdown  sharpe  final_x  exposure  positions  pos_30m_1h  pnl_30m_1h_M
+0  whole_at_2R       all       full 0.202        -0.368   1.015   38.475     0.874       9022         508         4.526
+1  whole_at_2R       all  since2022 0.391        -0.252   1.372    4.890     1.091       3892         491         0.545
+2  whole_at_2R       all     last2y 0.445        -0.161   1.618    2.075     0.939       1351         157         0.207
+3  whole_at_2R  original       full 0.124        -0.282   0.821   10.202     0.746       8061        1008         1.426
+4  whole_at_2R  original  since2022 0.167        -0.202   0.870    2.104     1.029       4177        1008         0.294
+5  whole_at_2R  original     last2y 0.121        -0.159   0.773    1.253     0.910       1681         534         0.134

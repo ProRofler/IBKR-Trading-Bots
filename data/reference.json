@@ -1,0 +1,262 @@
+{
+  "sectors": {
+    "SPY": "",
+    "QQQ": "",
+    "DIA": "",
+    "AAPL": "Technology",
+    "MSFT": "Technology",
+    "NVDA": "Technology",
+    "AVGO": "Technology",
+    "AMD": "Technology",
+    "ORCL": "Technology",
+    "CRM": "Technology",
+    "ADBE": "Technology",
+    "PLTR": "Technology",
+    "GOOGL": "Communications",
+    "META": "Communications",
+    "NFLX": "Communications",
+    "AMZN": "Communications",
+    "TSLA": "Consumer, Cyclical",
+    "HD": "Consumer, Cyclical",
+    "COST": "Consumer, Cyclical",
+    "WMT": "Consumer, Cyclical",
+    "KO": "Consumer, Non-cyclical",
+    "PEP": "Consumer, Non-cyclical",
+    "PG": "Consumer, Non-cyclical",
+    "JPM": "Financial",
+    "BAC": "Financial",
+    "V": "Financial",
+    "MA": "Financial",
+    "LLY": "Consumer, Non-cyclical",
+    "UNH": "Consumer, Non-cyclical",
+    "JNJ": "Consumer, Non-cyclical",
+    "MRK": "Consumer, Non-cyclical",
+    "ABBV": "Consumer, Non-cyclical",
+    "XOM": "Energy",
+    "CVX": "Energy",
+    "MU": "Technology",
+    "LRCX": "Technology",
+    "KLAC": "Technology",
+    "AMAT": "Technology",
+    "TSM": "Technology",
+    "ARM": "Technology",
+    "ANET": "Communications",
+    "VRT": "Industrial",
+    "APP": "Communications",
+    "CRWD": "Technology",
+    "PANW": "Communications",
+    "FICO": "Technology",
+    "SHOP": "Communications",
+    "MELI": "Communications",
+    "SPOT": "Communications",
+    "UBER": "Communications",
+    "DASH": "Communications",
+    "RDDT": "Communications",
+    "NBIS": "Technology",
+    "CRWV": "Technology",
+    "HOOD": "Communications",
+    "COIN": "Financial",
+    "MSTR": "Technology",
+    "NU": "Financial",
+    "SOFI": "Financial",
+    "KKR": "Financial",
+    "APO": "Financial",
+    "GS": "Financial",
+    "RKLB": "Industrial",
+    "ASTS": "Communications",
+    "AXON": "Industrial",
+    "GE": "Industrial",
+    "GEV": "Industrial",
+    "HWM": "Industrial",
+    "ETN": "Industrial",
+    "PWR": "Consumer, Non-cyclical",
+    "TT": "Industrial",
+    "CAT": "Industrial",
+    "URI": "Consumer, Non-cyclical",
+    "CTAS": "Consumer, Non-cyclical",
+    "CEG": "Utilities",
+    "VST": "Utilities",
+    "MNST": "Consumer, Non-cyclical",
+    "TJX": "Consumer, Cyclical",
+    "RCL": "Consumer, Cyclical",
+    "BKNG": "Communications",
+    "ORLY": "Consumer, Cyclical",
+    "ISRG": "Consumer, Non-cyclical",
+    "MCK": "Consumer, Non-cyclical",
+    "SMH": "",
+    "SOXX": "",
+    "XLK": "",
+    "XLI": "",
+    "XLF": "",
+    "ITA": "",
+    "URA": "",
+    "GLD": "",
+    "SLV": "",
+    "GDX": "",
+    "MAGS": "",
+    "DRAM": "",
+    "IBIT": ""
+  },
+  "leveraged": {
+    "SPY": {
+      "etf": "SSO",
+      "factor": 2.0,
+      "name": "PROSHARES ULTRA S&P500"
+    },
+    "QQQ": {
+      "etf": "QLD",
+      "factor": 2.0,
+      "name": "PROSHARES ULTRA QQQ"
+    },
+    "DIA": {
+      "etf": "DDM",
+      "factor": 2.0,
+      "name": "PROSHARES ULTRA DOW30"
+    },
+    "AAPL": {
+      "etf": "AAPU",
+      "factor": 2.0,
+      "name": "DIREXION DAILY AAPL BULL 2X"
+    },
+    "MSFT": {
+      "etf": "MSFU",
+      "factor": 2.0,
+      "name": "DIREXION DAILY MSFT BULL 2X"
+    },
+    "NVDA": {
+      "etf": "NVDU",
+      "factor": 2.0,
+      "name": "DIREXION DAILY NVDA BULL 2X"
+    },
+    "AMZN": {
+      "etf": "AMZU",
+      "factor": 2.0,
+      "name": "DIRE DLY AMZN BUL 2X ETF-USD"
+    },
+    "GOOGL": {
+      "etf": "GGLL",
+      "factor": 2.0,
+      "name": "DIREXION DAILY GOOGL BULL 2X"
+    },
+    "META": {
+      "etf": "METU",
+      "factor": 2.0,
+      "name": "DIREX DLY META BUL 2X ETF-US"
+    },
+    "TSLA": {
+      "etf": "TSLL",
+      "factor": 2.0,
+      "name": "DIRX DLY TSLA BUL 2X ETF-AUI"
+    },
+    "PLTR": {
+      "etf": "PLTU",
+      "factor": 2.0,
+      "name": "DIRE DLY PLTR BUL 2X ETF-USD"
+    },
+    "AVGO": {
+      "etf": "AVL",
+      "factor": 2.0,
+      "name": "DIREX DAI AV BULL 2X ETF-USD"
+    },
+    "AMD": {
+      "etf": "AMDL",
+      "factor": 2.0,
+      "name": "GRANITESHARES 2XLONG AMD ETF"
+    },
+    "LLY": {
+      "etf": "ELIL",
+      "factor": 2.0,
+      "name": "DIREXION DAILY LLY BULL 2X E"
+    },
+    "MU": {
+      "etf": "MUU",
+      "factor": 2.0,
+      "name": "DIREXION DAILY MU BULL 2X ET"
+    },
+    "TSM": {
+      "etf": "TSMX",
+      "factor": 2.0,
+      "name": "DIRXN DLY TSM BULL 2X ETF-UI"
+    },
+    "COIN": {
+      "etf": "CONL",
+      "factor": 2.0,
+      "name": "GRANITESH 2X LNG COIN ETF-US"
+    },
+    "MSTR": {
+      "etf": "MSTU",
+      "factor": 2.0,
+      "name": "T-REX 2X LONG MSTR DT ETF"
+    },
+    "CRWD": {
+      "etf": "CRWL",
+      "factor": 2.0,
+      "name": "GRANITESHARES 2X L CRWD ETF"
+    },
+    "PANW": {
+      "etf": "PALU",
+      "factor": 2.0,
+      "name": "DIREXION DAILY PANW BULL 2X"
+    },
+    "ARM": {
+      "etf": "ARMG",
+      "factor": 2.0,
+      "name": "LEVERAGE SHARES 2X ARM"
+    },
+    "HOOD": {
+      "etf": "HOOX",
+      "factor": 2.0,
+      "name": "DEFIANCE D TAR 2X L HOOD ETF"
+    },
+    "APP": {
+      "etf": "APPX",
+      "factor": 2.0,
+      "name": "TRADR 2X LONG APP DAILY ETF"
+    },
+    "RKLB": {
+      "etf": "RKLX",
+      "factor": 2.0,
+      "name": "DEFI DAILY TA 2X L RKLB ETF"
+    },
+    "SHOP": {
+      "etf": "SHPU",
+      "factor": 2.0,
+      "name": "DIRXION DLY SHOP BULL 2X ETF"
+    },
+    "SMH": {
+      "etf": "USD",
+      "factor": 2.0,
+      "name": "PROSHARES ULTRA SEMICONDUCT"
+    },
+    "XLK": {
+      "etf": "ROM",
+      "factor": 2.0,
+      "name": "PROSHARES ULTRA TECHNOLOGY"
+    },
+    "XLF": {
+      "etf": "UYG",
+      "factor": 2.0,
+      "name": "PROSHARES ULTRA FINANCIALS"
+    },
+    "XLI": {
+      "etf": "UXI",
+      "factor": 2.0,
+      "name": "PROSHARES ULTRA INDUSTRIALS"
+    },
+    "GLD": {
+      "etf": "UGL",
+      "factor": 2.0,
+      "name": "PROSHARES ULTRA GOLD"
+    },
+    "SLV": {
+      "etf": "AGQ",
+      "factor": 2.0,
+      "name": "PROSHARES ULTRA SILVER"
+    },
+    "GDX": {
+      "etf": "NUGT",
+      "factor": 2.0,
+      "name": "DIRXN DLY GM INDX B2X ETF-UI"
+    }
+  }
+}

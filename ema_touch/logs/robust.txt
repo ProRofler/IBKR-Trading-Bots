@@ -1,0 +1,54 @@
+﻿
+===== full =====
+                                   CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                  
+run8 exits, all                       0.130        0.146     0.185        -0.372       -0.436          0.761     0.937    20
+run10 exits, all                      0.161        0.208     0.235        -0.368       -0.430          0.927     1.039    20
+run8 exits, original                  0.070        0.099     0.130        -0.303       -0.372          0.668     0.685    20
+run10 exits, original                 0.111        0.136     0.148        -0.397       -0.459          0.768     0.880    20
+run10, all, above 200                 0.111        0.149     0.196        -0.391       -0.476          0.733     0.973    20
+run10, all, rising 200                0.111        0.132     0.157        -0.378       -0.417          0.675     0.920    20
+run10, original, rising 200           0.065        0.078     0.097        -0.286       -0.344          0.545     0.683    20
+run10, all, no leveraged ETFs         0.137        0.178     0.203        -0.312       -0.423          0.904     0.920    20
+run10, all, no margin                 0.073        0.109     0.131        -0.206       -0.265          0.874     0.519    20
+run10, all, strict                    0.022        0.032     0.047        -0.127       -0.164          0.624     0.161    20
+run10, all, rising 200, no lev        0.095        0.115     0.151        -0.308       -0.356          0.676     0.817    20
+run10, all, rising 200, no margin     0.059        0.075     0.097        -0.207       -0.245          0.687     0.469    20
+run10, 75% subsets                    0.141        0.186     0.213        -0.366       -0.519          0.868     0.982    20
+run10, 75% subsets, rising 200        0.095        0.129     0.147        -0.380       -0.448          0.699     0.871    20
+
+===== since2022 =====
+                                   CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                  
+run8 exits, all                       0.173        0.249     0.355        -0.291       -0.375          0.897     1.120    20
+run10 exits, all                      0.290        0.376     0.478        -0.294       -0.376          1.189     1.160    20
+run8 exits, original                  0.075        0.136     0.186        -0.201       -0.300          0.726     0.929    20
+run10 exits, original                 0.123        0.192     0.257        -0.221       -0.300          0.843     1.155    20
+run10, all, above 200                 0.224        0.310     0.374        -0.337       -0.423          1.031     1.146    20
+run10, all, rising 200                0.188        0.262     0.333        -0.353       -0.388          0.920     1.003    20
+run10, original, rising 200           0.041        0.081     0.127        -0.208       -0.228          0.500     0.837    20
+run10, all, no leveraged ETFs         0.233        0.318     0.373        -0.263       -0.295          1.179     0.985    20
+run10, all, no margin                 0.095        0.161     0.217        -0.171       -0.214          0.959     0.531    20
+run10, all, strict                   -0.005        0.035     0.084        -0.084       -0.159          0.616     0.156    20
+run10, all, rising 200, no lev        0.160        0.194     0.235        -0.300       -0.337          0.848     0.864    20
+run10, all, rising 200, no margin     0.057        0.095     0.140        -0.165       -0.231          0.752     0.494    20
+run10, 75% subsets                    0.266        0.374     0.464        -0.312       -0.376          1.153     1.134    20
+run10, 75% subsets, rising 200        0.188        0.256     0.391        -0.349       -0.412          0.903     1.037    20
+
+===== last2y =====
+                                   CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                  
+run8 exits, all                       0.088        0.223     0.399        -0.255       -0.330          0.881     1.128    20
+run10 exits, all                      0.161        0.312     0.501        -0.288       -0.387          1.036     1.105    20
+run8 exits, original                  0.039        0.264     0.346        -0.170       -0.252          1.135     1.026    20
+run10 exits, original                 0.108        0.184     0.311        -0.165       -0.237          0.915     1.101    20
+run10, all, above 200                 0.099        0.306     0.440        -0.352       -0.420          0.917     1.144    20
+run10, all, rising 200                0.077        0.256     0.492        -0.337       -0.383          0.880     1.075    20
+run10, original, rising 200           0.071        0.100     0.151        -0.185       -0.214          0.576     0.808    20
+run10, all, no leveraged ETFs         0.108        0.247     0.400        -0.232       -0.314          0.992     0.942    20
+run10, all, no margin                 0.041        0.119     0.215        -0.160       -0.206          0.833     0.521    20
+run10, all, strict                    0.007        0.043     0.101        -0.061       -0.152          0.741     0.161    20
+run10, all, rising 200, no lev        0.048        0.196     0.426        -0.282       -0.340          0.833     0.884    20
+run10, all, rising 200, no margin     0.017        0.080     0.248        -0.138       -0.225          0.660     0.490    20
+run10, 75% subsets                    0.147        0.211     0.510        -0.298       -0.392          0.795     1.127    20
+run10, 75% subsets, rising 200        0.136        0.263     0.469        -0.335       -0.456          0.862     1.064    20

@@ -1,0 +1,13 @@
+﻿=== Exit variants (entry rules on, after costs) ===
+                    trades  win_rate  avg_r  avg_r_cap10  profit_factor  median_bars  kept_of_peak  reached_be  total_r_cap10
+ladder_min10_w1  69337.000     0.211  0.138        0.111          1.331        4.000         0.454       0.689       7692.646
+ladder_min10_w05 71770.000     0.248  0.116        0.098          1.285        4.000         0.489       0.677       7014.017
+ladder_min20_w1  67971.000     0.199  0.153        0.114          1.364        4.000         0.429       0.693       7780.043
+ladder_min20_w05 69851.000     0.231  0.136        0.108          1.329        4.000         0.458       0.689       7567.984
+
+=== Avg R (cap 10) by timeframe ===
+tf                 30m    1h    4h    1d    1w
+ladder_min10_w1  0.097 0.195 0.084 0.072 0.251
+ladder_min10_w05 0.097 0.195 0.067 0.059 0.205
+ladder_min20_w1  0.097 0.195 0.088 0.072 0.281
+ladder_min20_w05 0.097 0.195 0.086 0.068 0.230
