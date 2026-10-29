@@ -1,4 +1,4 @@
-"""Compare take-profit / trailing-exit variants on the same signals.
+"""Compare take-profit / trailing-exit variants on the same signals (and, in round 7, entry variants).
 
 Usage:
     python -m ema_touch.backtest.exits
@@ -59,11 +59,33 @@ ROUND_5 = {
     "whole_at_4R": replace(DEFAULT, target_r=4.0, target_fraction=1.0, tf_overrides={}),
 }
 # Round 6: ladder settings on 4h/1d/1w, to pick the best per timeframe (30m/1h unaffected)
-VARIANTS = {
+ROUND_6 = {
     "ladder_min10_w1": replace(DEFAULT, ladder_min_period=10, ladder_wiggle_atr=1.0),
     "ladder_min10_w05": replace(DEFAULT, ladder_min_period=10, ladder_wiggle_atr=0.5),
     "ladder_min20_w1": replace(DEFAULT, ladder_min_period=20, ladder_wiggle_atr=1.0),
     "ladder_min20_w05": replace(DEFAULT, ladder_min_period=20, ladder_wiggle_atr=0.5),
+}
+# Round 7: buy on the touch itself and sell at the close if it didn't hold, vs the next-bar entry.
+# The touch entry has a different stop, so compare return per trade (avg_ret), not only R.
+ROUND_7 = {
+    "next_bar": DEFAULT,
+    "touch_1d_1w": replace(DEFAULT, tf_overrides={**DEFAULT.tf_overrides, "1d": {"entry_mode": "touch"},
+                                                  "1w": {"entry_mode": "touch"}}),
+    "touch_all": replace(DEFAULT, entry_mode="touch"),
+}
+# Round 8 (1d/1w only): a higher win rate by moving the stop to breakeven later, or by selling part of
+# the position at a target while the rest stays on the EMA ladder
+VARIANTS = {
+    "base": DEFAULT,
+    "be_05R": replace(DEFAULT, breakeven_r=0.5),
+    "be_1R": replace(DEFAULT, breakeven_r=1.0),
+    "be_2R": replace(DEFAULT, breakeven_r=2.0),
+    "be_3R": replace(DEFAULT, breakeven_r=3.0),
+    "be_off": replace(DEFAULT, breakeven_r=1000.0),  # the stop only rises with the EMA ladder
+    "p25_2R": replace(DEFAULT, ladder_partial_r=2.0),
+    "p25_3R": replace(DEFAULT, ladder_partial_r=3.0),
+    "p33_2R": replace(DEFAULT, ladder_partial_r=2.0, ladder_partial_fraction=1 / 3),
+    "be_1R_p25_2R": replace(DEFAULT, breakeven_r=1.0, ladder_partial_r=2.0),
 }
 
 
@@ -75,6 +97,7 @@ def summarize(t: pd.DataFrame) -> dict:
         "win_rate": (t.r > 0).mean(),
         "avg_r": t.r.mean(),
         "avg_r_cap10": t.r.clip(upper=10).mean(),
+        "avg_ret": (t.r * t.risk_pct).mean(),  # return on the position, after costs
         "profit_factor": wins / losses,
         "median_bars": t.bars_held.median(),
         # of trades that were at least +2R at some point, how much of the peak was kept
@@ -86,18 +109,24 @@ def summarize(t: pd.DataFrame) -> dict:
 
 def main():
     results = run(DEFAULT, VARIANTS)
-    rows, by_tf = {}, {}
+    rows, by_tf, ret_tf, n_tf = {}, {}, {}, {}
     for name, trades in results.items():
         trades.to_parquet(RESULTS_DIR / f"exit_{name}_trades.parquet")
         t = trades[entry_allowed(trades)]
         rows[name] = summarize(t)
         by_tf[name] = t.groupby("tf").r.apply(lambda r: r.clip(upper=10).mean()).reindex(TIMEFRAMES)
+        ret_tf[name] = t.assign(ret=t.r * t.risk_pct).groupby("tf").ret.mean().reindex(TIMEFRAMES)
+        n_tf[name] = t.groupby("tf").size().reindex(TIMEFRAMES)
 
     pd.set_option("display.width", 250)
     print("=== Exit variants (entry rules on, after costs) ===")
     print(pd.DataFrame(rows).T.to_string(float_format=lambda x: f"{x:.3f}"))
     print("\n=== Avg R (cap 10) by timeframe ===")
     print(pd.DataFrame(by_tf).T.to_string(float_format=lambda x: f"{x:.3f}"))
+    print("\n=== Avg return per trade by timeframe ===")
+    print(pd.DataFrame(ret_tf).T.to_string(float_format=lambda x: f"{x:.2%}"))
+    print("\n=== Trades by timeframe ===")
+    print(pd.DataFrame(n_tf).T.to_string())
 
 
 if __name__ == "__main__":

@@ -1,0 +1,23 @@
+=== Exit variants (entry rules on, after costs) ===
+               trades  win_rate  avg_r  avg_r_cap10  avg_ret  profit_factor  median_bars  kept_of_peak  reached_be  total_r_cap10
+next_bar    67971.000     0.199  0.153        0.114    0.006          1.364        4.000         0.429       0.693       7780.043
+touch_1d_1w 70927.000     0.208  0.166        0.130    0.006          1.382        4.000         0.422       0.652       9250.335
+touch_all   73610.000     0.207  0.159        0.115    0.006          1.335        4.000         0.397       0.596       8475.379
+
+=== Avg R (cap 10) by timeframe ===
+tf            30m    1h    4h    1d    1w
+next_bar    0.097 0.195 0.088 0.072 0.281
+touch_1d_1w 0.097 0.195 0.088 0.115 0.304
+touch_all   0.052 0.144 0.089 0.115 0.304
+
+=== Avg return per trade by timeframe ===
+tf            30m    1h    4h    1d    1w
+next_bar    0.14% 0.38% 0.36% 0.36% 3.73%
+touch_1d_1w 0.14% 0.38% 0.36% 0.54% 3.29%
+touch_all   0.08% 0.30% 0.36% 0.54% 3.29%
+
+=== Trades by timeframe ===
+tf             30m     1h     4h     1d    1w
+next_bar     11192  10569  17520  23784  4906
+touch_1d_1w  11192  10569  17520  26818  4828
+touch_all    12253  11255  18456  26818  4828

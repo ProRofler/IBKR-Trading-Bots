@@ -1,5 +1,136 @@
 # Backtest results (2026-10-28)
 
+## Run 15: higher win rate (later breakeven, partial profit) and small-account commissions (2026-10-30)
+
+Run 13 rules on the previous 96 symbols. Variants (`Params.breakeven_r`, `Params.ladder_partial_r` / `ladder_partial_fraction`): stop to breakeven at +0.5R / +1R / +2R / +3R / never (instead of +1%), and selling 25% at +2R with the rest on the EMA ladder. Cost models (`Params.start_equity`, `Params.commission_min`): $1M with percentage costs as before, and $10k with a minimum commission per order of $1 (IBKR Fixed) or $0.35 (IBKR Tiered, approximate). Run with `python -m ema_touch.backtest.exits` (round 8) and `python -m ema_touch.backtest.robust --match '$'` (round 6, `results/robust_runs_round6.csv`).
+
+**Per trade (all 152 symbols, entry rules on)**
+
+| Variant | Win rate | Avg R (cap 10) | Return per trade | Avg R on the 56 steady stocks |
+|---|---|---|---|---|
+| Breakeven at +1% (current) | 19.6% | 0.115 | 0.7% | 0.079 |
+| at +0.5R | 22.7% | 0.143 | 1.0% | 0.096 |
+| at +1R | 29.7% | 0.194 | 1.3% | 0.140 |
+| at +2R | 34.1% | 0.239 | 1.6% | 0.186 |
+| at +3R | 32.2% | 0.266 | 1.8% | 0.210 |
+| 25% at +2R, rest on the ladder | 21.7% | 0.112 | 0.6% | |
+
+**Portfolio, 20 replays each: median CAGR / median max DD / median Sharpe**
+
+| Variant | 2007–2026, $1M | 2022–2026, $1M | Last 2 years, $1M | Last 2 years, $10k Fixed |
+|---|---|---|---|---|
+| **Breakeven at +1% (current)** | 24.5% / −38% / 1.10 | 46.6% / −29% / 1.54 | **48.0% / −23% / 1.53** | 42.3% |
+| at +0.5R | 27.3% / −35% / 1.11 | 49.6% / −31% / 1.54 | 13.0% / −21% / 0.65 | 10.3% |
+| at +1R | 23.9% / −36% / 1.00 | 51.8% / −32% / 1.53 | 20.1% / −24% / 0.81 | 13.1% |
+| at +2R | 25.7% / −42% / 1.03 | 52.8% / −32% / 1.57 | 11.8% / −23% / 0.60 | 10.3% |
+| at +3R | 28.8% / −40% / 1.10 | 46.8% / −32% / 1.46 | 10.6% / −22% / 0.59 | 5.6% |
+| never (ladder only) | 9.2% / −36% / 0.54 | 51.9% / −35% / 1.43 | 12.3% / −27% / 0.58 | 9.2% |
+| 25% at +2R | 20.0% / −36% / 0.96 | 39.0% / −32% / 1.33 | 37.8% / −26% / 1.27 | 31.6% |
+| +1R and 25% at +2R | 18.8% / −37% / 0.84 | 41.0% / −35% / 1.33 | 2.2% / −20% / 0.23 | −0.4% |
+
+**Commission at $10k (current rules)**: CAGR 2007– / since 2022 / last 2 years
+
+| Cost model | 2007– | 2022– | Last 2 years |
+|---|---|---|---|
+| $1M, percentage costs | 24.5% | 46.6% | 48.0% |
+| $10k, $1 minimum (IBKR Fixed) | 21.8% | 40.4% | 42.3% |
+| $10k, $0.35 minimum (IBKR Tiered) | 23.8% | 46.5% | 46.6% |
+
+**Findings**
+- **A later breakeven raises the win rate and the edge per trade, on the trend and the steady stocks alike, but not the portfolio.** It wins some windows and loses the last 2 years badly (48% → 11–20%). The +1% breakeven is what feeds the buffer rule: positions get out of risk within days, so new ones can open. With a later breakeven, positions stay at risk longer, the buffer rule blocks entries, and the account sits under-invested (exposure over the last 2 years: 0.81× → 0.46× at +3R). Without any breakeven, almost nothing gets out of risk after the first positions, so the account is nearly empty (exposure 0.04× since 2007). **Kept at +1%.**
+- **Partial profits lower returns everywhere** (25% at +2R: 24.5% → 20.0%). Rejected again.
+- **The win rate stays around 20%.** It is the price of this design: many tiny breakeven exits keep the risk budget free for new entries, and a few long trends pay for everything.
+- **At $10k, IBKR Fixed's $1 minimum costs 3–6 points of CAGR a year; Tiered's ~$0.35 minimum costs about 1.** Use Tiered pricing for the small account. Positions are not rounded to whole shares here: at $10k, 21 of the 96 symbols cost more than a 5% position ($500), and rounding leaves the rest about 18% under size.
+
+## Run 14: 56 steady large caps added (2026-10-29)
+
+Added `common.universe.STEADY_STOCKS`: big, liquid names in steady but unspectacular uptrends (MS, AXP, SPGI, HON, UNP, LMT, MCD, LOW, ABT, TMO, AMGN, CSCO, IBM, TXN, INTU, NEE, COP, PLD, …). Daily and weekly bars only. Data fixes: IBKR's history has a year missing for CME (2007-07 to 2008-07) and 2.5 years for TMUS (2013-04 to 2015-10, MetroPCS before), cut with `HISTORY_START`. A gap scan of all 152 symbols finds no other holes. Run 13 rules (1d touch entry, 1w next-bar). `python -m ema_touch.backtest.robust`, round 5 (`results/robust_runs_round5.csv`).
+
+**Per trade (entry rules on, after costs), avg R (cap 10) / return per trade / profit factor**
+
+| Group | 1d | 1w | 1d / 1w since 2022 (avg R) |
+|---|---|---|---|
+| Steady 56 | 0.074 / 0.2% / 1.23 | 0.108 / 0.8% / 1.60 | 0.005 / 0.036 |
+| Previous 96 | 0.115 / 0.5% / 1.39 | 0.281 / 3.7% / 3.05 | 0.141 / 0.274 |
+| Original 34 | 0.079 / 0.3% / 1.27 | 0.226 / 3.1% / 2.53 | 0.060 / 0.138 |
+
+On the steady 56 the edge per trade is positive in every 5-year era but small, and close to zero since 2022 (1d by era: 0.036, 0.080, 0.164, 0.005).
+
+**Portfolio, 20 replays each: CAGR median (10th–90th percentile) / median max DD / median Sharpe**
+
+| Universe | 2007–2026 | 2022–2026 | Last 2 years |
+|---|---|---|---|
+| Previous 96 | 24.5% (24–26) / −38% / 1.10 | 46.6% (41–52) / −29% / 1.54 | 48.0% (43–52) / −23% / 1.53 |
+| All 152 | 20.4% (19–22) / −31% / 1.03 | 37.3% (34–43) / −27% / 1.49 | 24.0% (20–45) / −13% / 1.43 |
+| ↳ random 75% of symbols | 21.0% / −31% / 1.06 | 34.0% / −28% / 1.39 | 24.5% / −15% / 1.29 |
+| ↳ no margin | 13.1% / −18% / 1.08 | 23.6% / −16% / 1.49 | 19.1% / −8% / 1.54 |
+| Steady 56 only | 10.6% (10–12) / −24% / 0.75 | 6.8% / −19% / 0.58 | 11.8% / −9% / 1.23 |
+| Original 34 | 13.3% / −29% / 0.81 | 11.2% / −29% / 0.63 | 9.8% / −15% / 0.69 |
+| SPY buy & hold | 8.9% / −57% / 0.54 | 10.4% / −25% / 0.66 | 16.2% / −19% / 1.00 |
+
+**Findings**
+- **Adding the steady names lowers returns in every window** (2007–: 24.5% → 20.4%; last 2 years: 48% → 24%) and lowers drawdowns (−38% → −31%; −23% → −13%). Sharpe is a little lower. Over the last 2 years the average exposure falls from 0.81× to 0.57×: steady positions sit at risk longer and the buffer rule then blocks new entries, so capital goes to weaker names instead of waiting for strong ones.
+- **On ordinary large caps alone the strategy is modest:** 10.6% CAGR since 2007 with a −24% drawdown, vs SPY's 8.9% with −57%. Better risk-adjusted than SPY, but below SPY since 2022. Most of the headline return comes from trading strong trending stocks, which supports picking symbols by a relative-strength rule instead of by hand.
+- **Replay noise:** "previous 96" here and "1d touch + 1w next-bar" in run 13 are the same trades, but adding symbols changes each signal's random order. The medians came out 24.5% vs 26.1%. Differences of 1–2 points between replay sets are noise.
+
+## Run 13: daily and weekly only (2026-10-29, now the default)
+
+30m, 1h and 4h are no longer traded (`Params.timeframes = ("1d", "1w")`). **Adopted: touch entry on 1d, next-bar entry on 1w** (row "1d touch + 1w next-bar" below; user decision after the weekly finding). Default trades: `results/default_trades.parquet` = `exit_touch_1d` on 1d/1w. `python -m ema_touch.backtest.robust`, round 4 (`results/robust_runs_round4*.csv`).
+
+**Portfolio, 20 replays each: CAGR median (10th–90th percentile) / median max DD / median Sharpe**
+
+| Setup | 2007–2026 | 2022–2026 | Last 2 years |
+|---|---|---|---|
+| All 5 timeframes (run 12 default) | 30.7% (29–32) / −33% / 1.28 | 45.6% (34–52) / −27% / 1.45 | 47.7% (39–60) / −21% / 1.56 |
+| **1d + 1w** | **30.7% (29–32) / −32% / 1.30** | **47.0% (44–51) / −25% / 1.56** | 43.6% (34–54) / −21% / 1.46 |
+| ↳ no leveraged ETFs (plain margin) | 27.2% (26–28) / −28% / 1.28 | 39.7% / −22% / 1.54 | 39.5% / −21% / 1.44 |
+| ↳ no margin (max 100% invested) | 16.1% (15–17) / −14% / 1.23 | 19.6% / −13% / 1.31 | 24.5% / −10% / 1.54 |
+| ↳ random 75% of symbols | 30.0% (28–33) / −32% / 1.29 | 49.3% / −25% / 1.58 | 46.5% (24–58) / −25% / 1.48 |
+| ↳ original 34 | 15.1% (15–16) / −26% / 0.91 | **3.0%** (2–4) / −26% / 0.27 | 9.7% / −9% / 0.76 |
+| ↳ strict adding rule | 5.3% / −8% / 0.95 | 2.9% | 1.6% |
+| 1d + 1w, next-bar entry on both | 21.1% (19–22) / −36% / 0.99 | 41.2% / −27% / 1.35 | 38.5% / −27% / 1.29 |
+| ↳ original 34 | 13.0% / −30% / 0.79 | 14.9% / −21% / 0.81 | 12.0% / −14% / 0.82 |
+| **1d touch + 1w next-bar (adopted)** | **26.1% (24–27) / −37% / 1.14** | **46.7% (45–52) / −30% / 1.52** | **45.3% (41–50) / −23% / 1.49** |
+| ↳ random 75% of symbols | 24.9% (23–28) / −33% / 1.11 | 49.5% / −28% / 1.55 | 40.3% (27–60) / −24% / 1.40 |
+| ↳ original 34 | 12.6% / −29% / 0.79 | 11.0% / −29% / 0.62 | 10.0% / −15% / 0.70 |
+| SPY buy & hold | 8.9% / −57% / 0.54 | 10.4% / −25% / 0.66 | 16.2% / −19% / 1.00 |
+
+**Findings**
+- **Dropping 30m/1h/4h costs nothing:** same return since 2007, slightly lower drawdown, higher Sharpe since 2022, a little lower over the last 2 years. The bot only needs daily bars. Adopted.
+- **Leverage is still a risk dial:** Sharpe is 1.23–1.30 with leveraged ETFs, plain margin or no margin.
+- **Warning: on the original 34 large caps the touch entry on 1w did badly since 2022** (3.0% CAGR vs 14.9% with the next-bar entry). Weekly positions earned $141k vs $699k in one replay; weekly trades on these 34 since 2022 averaged +0.56% vs +2.44%. Over the full period the touch entry is still better on the same 34 (15.1% vs 13.0%), and on all 96 it is better in every window. Weekly trades on 34 symbols over 4 years are a small sample, so this may be noise, but it is the weakest spot of the current rules. The tighter weekly stop (median 6.5% vs 8.0% of price) shakes out of more of the big weekly trends.
+- On the original 34, the touch entry doesn't help on 1d either recently; its gain comes from the trend stocks added in run 8, where the next-bar entry often misses gap-ups after a touch.: buy on the touch, check the hold before the close (2026-10-29, now the default on 1d/1w)
+
+**Rule tested** (`Params.entry_mode = "touch"`): a limit buy rests at the top of the touch band (previous bar's EMA + 0.25 ATR) and fills when price touches it during the session; the stop is the previous bar's EMA − 1 ATR. Near the close, if price is below the band (the touch didn't hold), sell. Otherwise manage the position as before. The old rule (`"next_bar"`) waited for the touch bar to close and held, then bought the next bar at close + 0.1 ATR. Run with `python -m ema_touch.backtest.exits` (round 7) and `python -m ema_touch.backtest.robust` (round 3, `results/robust_runs_round3.csv`).
+
+**Per trade (entry rules on, after costs)**
+
+| Timeframe | Next-bar entry: avg R (cap 10) / return per trade / trades | Touch entry |
+|---|---|---|
+| 30m | 0.097 / 0.14% / 11,192 | 0.052 / 0.08% / 12,253 |
+| 1h | 0.195 / 0.38% / 10,569 | 0.144 / 0.30% / 11,255 |
+| 4h | 0.088 / 0.36% / 17,520 | 0.089 / 0.36% / 18,456 |
+| 1d | 0.072 / 0.36% / 23,784 | **0.115 / 0.54% / 26,818** |
+| 1w | 0.281 / 3.73% / 4,906 | **0.304** / 3.29% / 4,828 |
+
+On 1d the better price shows: 17.6% of trades reach the trailing exit vs 15.8%. 9% of touches don't hold and are sold at the close, at about −1.9% each. On 1w the stop is tighter (median risk 6.5% vs 8.0%), so R is higher but the average return per trade is lower.
+
+**Portfolio, 20 replays each: CAGR median (10th–90th percentile) / median max DD / median Sharpe**
+
+| Setup | 2007–2026 | 2022–2026 | Last 2 years |
+|---|---|---|---|
+| Next-bar entry (run 11 default) | 21.8% (20–24) / −38% / 0.98 | 40.3% (33–45) / −33% / 1.29 | 37.9% (35–40) / −25% / 1.25 |
+| **Touch entry on 1d + 1w** | **30.7% (29–32) / −33% / 1.28** | 45.6% (34–52) / **−27%** / 1.45 | 47.7% (39–60) / **−21%** / **1.56** |
+| Touch entry on 1d only | 27.6% (26–29) / −38% / 1.15 | **49.7% (47–55)** / −34% / **1.47** | **48.6%** (32–57) / −23% / 1.47 |
+| Next-bar, random 75% of symbols | 19.0% (17–23) / −39% / 0.89 | 38.6% / −32% | 29.0% / −26% |
+| Touch on 1d, random 75% of symbols | 25.1% (21–27) / −37% / 1.09 | 44.9% / −32% | 38.0% / −25% |
+
+**Findings**
+- The touch entry on 1d + 1w beats the next-bar entry in every window, with lower drawdowns and a higher Sharpe. Average exposure rises only from 0.98× to 1.09×, so most of the gain is not extra leverage. **Adopted for 1d and 1w** (`Params.tf_overrides`).
+- 30m and 1h are worse with the touch entry, and 4h is unchanged; they keep the next-bar entry. A check 15 minutes before a 30m bar closes is also impractical with delayed data.
+- **The close as a stand-in for "15 minutes before the close":** on daily touches since 2024-11 (4,153 with 30m data), deciding at 15:30 matches the decision at the close 95% of the time. 3% looked held at 15:30 but failed by the close (we'd keep them), 2% the reverse (we'd sell them). With 15-minute delayed data, a check at 15:45 sees about the 15:30 price, so this is what live trading on delayed data would get.
+- Robustness experiments from run 11 (`robust.py` rounds 1–2) still use the next-bar trades (`results/exit_next_bar_trades.parquet`).
+
 ## Run 11: robustness test (each portfolio replayed 20 times) and the recommended setup
 
 **Why:** a single portfolio run is one path. Signals that arrive at the same time (all daily bars close at 16:00) were taken in whatever order the data happened to be in, and that decides which symbols get the capital. The same trades and rules gave 25.7%, 20.6% or 14.3% CAGR depending only on that order. From now on, compare portfolio setups with `python -m ema_touch.backtest.robust`. It replays each setup 20 times with same-time signals in a random order (or on a random 75% of the symbols) and reports the range. Results: `results/robust_runs_round1.csv`, `robust_runs_round2.csv`.

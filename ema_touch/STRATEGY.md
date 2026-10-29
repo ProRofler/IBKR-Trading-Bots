@@ -7,8 +7,8 @@ If price has touched a moving average 3 times in a row and held it each time, we
 
 ## 2. Indicators and timeframes
 - Moving averages: **EMA only**, periods 5, 10, 20, 50, 100, 200 (6 lines). SMA was dropped on 2026-10-28; this applies to signals and the index checks.
-- Timeframes: 30m, 1h, 4h, 1d, 1w
-- Entry points: the 10, 20, 50, 100 and 200 EMA (the 5 EMA is not an entry), so 25 EMA/timeframe combinations per symbol
+- Timeframes: **1d and 1w** (`Params.timeframes`). 30m, 1h and 4h were dropped on 2026-10-29 (BACKTEST_RESULTS.md run 13); their rules below are kept for reference and marked "(dropped)".
+- Entry points: the 10, 20, 50, 100 and 200 EMA (the 5 EMA is not an entry), so 10 EMA/timeframe combinations per symbol
 - ATR (average true range) is calculated on the same timeframe as the MA, period 14 **[proposed]**
 
 ## 3. Signal
@@ -21,7 +21,7 @@ If price has touched a moving average 3 times in a row and held it each time, we
 - **Break:** a close below the **break level = MA − 1.5 × ATR**. Breaks do **not** reset the count (changed 2026-10-28): if the instrument has reacted to this EMA in the past, we assume it will again, even if it broke through in between.
 - After any touch (held or not), price must trade fully above the band again before the next touch counts
 - Touches must be at least 5 bars apart **[proposed]**
-- **Signal:** at least 3 held touches within the last **500 bars** **[proposed]**, so old reactions eventually age out. 500 bars is about 38 trading days on 30m, about 2 years on 1d and about 10 years on 1w.
+- **Signal:** at least 3 held touches within the last **500 bars** **[proposed]**, so old reactions eventually age out. 500 bars is about 2 years on 1d and about 10 years on 1w.
 - Tested and not needed: also requiring the EMA to have held at least 60% of the time (held touches vs breaks).
 
 ### 3.2 Trend filter [proposed]
@@ -53,8 +53,8 @@ Dropped after the backtest of 2026-10-28 (see BACKTEST_RESULTS.md), because they
 - A counter-signal on **SPY** is a hard block: no new entries.
 - A counter-signal on **QQQ or DIA** (where checked) caps the position at 5%.
 - **Confluence:** SPY's daily bar is touching its 20, 50, 100 or 200 MA (SMA or EMA, as in section 3.1).
-  - **30m and 1h:** confluence is **required**. Without it these timeframes lost money after costs in the backtest.
-  - **4h, 1d, 1w:** confluence is optional and raises the size to 10% (section 6).
+  - **1d, 1w:** confluence is optional and raises the size to 10% (section 6).
+  - (dropped) 30m and 1h required confluence: without it they lost money after costs.
 
 ## 5. Instruments
 - Individual stocks
@@ -82,36 +82,48 @@ Dropped after the backtest of 2026-10-28 (see BACKTEST_RESULTS.md), because they
 - **10%** with SPY confluence (section 4.3), unless a QQQ (tech stocks) or DIA counter-signal caps it at 5%.
 - Size is in dollars, rounded down to whole shares.
 
-## 7. Entry [proposed]
-- Wait for the touch bar to **close** and hold (section 3.1).
-- Then send a **limit buy at that bar's close + 0.1 × ATR**, valid for one bar. If it doesn't fill, the signal expires.
+## 7. Entry
+**1d: buy on the touch** (adopted 2026-10-29, BACKTEST_RESULTS.md run 12)
+- Before the session, for every EMA whose touch count, slope and gap conditions already hold (section 3.1) and where price is above the band, place a **limit buy at the top of the band**: the previous day's EMA + 0.25 × ATR, valid for the day. It fills when price touches the band during the session.
+- Attached stop: the previous day's EMA − 1 × ATR.
+- **About 15 minutes before the close**, check the hold: if price is below the band (EMA − 0.25 × ATR, with the EMA updated for the current price), **sell**. Otherwise keep the position and manage it as in section 8.
+- An order does not need live data: IBKR fills it on the touch. With 15-minute delayed data, a check at 15:45 sees about the 15:30 price, which gives the same decision as the close 95% of the time.
+
+**1w: buy the week after the touch**
+- Wait for the touch week to **close** and hold (section 3.1).
+- Then send a **limit buy at that week's close + 0.1 × ATR**, valid for the next week. If it doesn't fill, the signal expires.
+- The touch entry was tested on 1w (run 13): best on all 96 symbols, but much worse on the original 34 large caps since 2022 (3% vs 15% CAGR). Its tighter stop shakes out of big weekly trends. Kept next-week entry (user decision 2026-10-29).
+
+**(dropped) 30m, 1h, 4h: buy the bar after the touch**, as on 1w. The touch entry was worse on 30m/1h and no better on 4h.
+
+**All timeframes**
 - One position per symbol. If several MA/timeframe combinations trigger at once, the **highest timeframe** (and within it, the longest MA) defines the stop and exit.
 - **Strongest signals first** (adopted 2026-10-28): when signals on different symbols arrive at the same time and buying power or the adding rule can't take them all, take them in order of timeframe (1w first), then entry EMA (200 first). In the robustness test this raised the median return and made results much less dependent on luck (BACKTEST_RESULTS.md, run 11).
 
 ## 8. Exits [proposed]
 All exit orders are sent to TWS as a **bracket** together with the entry, so IBKR holds them even if the bot is offline.
 
-- **Initial stop:** the lower of (MA − 1 × ATR) and (touch-bar low − 0.25 × ATR)
+- **Initial stop:** the lower of (MA − 1 × ATR) and (touch-bar low − 0.25 × ATR). With the touch entry (1d): the previous day's MA − 1 × ATR, since the touch bar's low isn't known at entry.
 - **Breakeven:** at +1% profit, move the stop to the entry price
 - R = entry − initial stop. Each timeframe uses the best exit tested for it (BACKTEST_RESULTS.md, runs 9–10).
 
 | Timeframe | Take profit |
 |---|---|
-| 30m | Sell the **whole position at 4R** |
-| 1h | Sell **50% at 3R**; the rest exits on a close below the break level |
-| 4h, 1d, 1w | **EMA ladder** down to the 20 EMA, stop 1 × ATR below the support EMA |
+| 1d, 1w (and 4h, dropped) | **EMA ladder** down to the 20 EMA, stop 1 × ATR below the support EMA |
+| (dropped) 30m | Sell the **whole position at 4R** |
+| (dropped) 1h | Sell **50% at 3R**; the rest exits on a close below the break level |
 
-**30m: whole position at 4R**
+**(dropped) 30m: whole position at 4R**
 - One limit order at entry + 4R. Before that, the position exits at the stop or on a close below the break level (MA − 1.5 × ATR).
 - Selling everything beat selling half on 30m: 0.097R per trade vs 0.081R for half at 3R (2R: 0.032, 3R: 0.067).
 
-**1h: half at 3R + trail**
+**(dropped) 1h: half at 3R + trail**
 - **Part 1:** sell 50% at **3R**.
 - **Part 2:** the remaining 50% exits when a bar closes below the break level of the signal MA (MA − 1.5 × ATR, the touch streak broke), or at the stop.
 - Until the stop moves to breakeven, the initial stop (MA − 1 × ATR) is above the break level, so it triggers first. After breakeven, the break level acts as a trailing exit as the MA rises.
 - On 1h this beat selling everything (0.195R vs 0.114–0.171R). The trailed half often gives back to below 3R (median +1.0R), but its runners average +2.15R.
 
-**4h, 1d and 1w: EMA ladder**
+**1d and 1w (and 4h, dropped): EMA ladder**
 - After entry on an EMA, when a bar closes above a shorter EMA, that EMA becomes the new support. The stop moves to EMA − 1 × ATR, is updated every bar and is never lowered.
 - Rungs: 20, 50, 100, 200 EMA. Example: entry on the 200 EMA climbs 100 → 50 → 20. An entry on the 10 EMA trails the 10 EMA once its stop is at breakeven.
 - The whole position exits at the stop. There is no partial target.
@@ -121,6 +133,7 @@ Tested and rejected (BACKTEST_RESULTS.md, runs 4–5, 9–10):
 - Tighter trailing exits (touch band, 2–3 ATR chandelier) and profit locks (stop to +0.25R after +1R, or +0.5R after +1.5R).
 - Wiggle 0–0.5 ATR, and the 5 or 10 EMA as the lowest ladder rung.
 - They keep more of each winner's peak but cut the big runners short, which earn most of the profit.
+- Breakeven later than +1% (at +0.5R to +3R, or never) and selling 25–33% at +2R/+3R (run 15). A later breakeven raises the win rate (20% → 34% at +2R) and the edge per trade, but positions stay at risk longer, the adding rule (section 9) blocks new entries, and the portfolio does much worse over the last 2 years. The +1% breakeven is what keeps the risk budget free. Expect a win rate around 20%.
 
 ## 9. Rule for adding positions
 - Each position's stop moves to entry once that position is +1% (section 8). The +1% is measured on the position, not the portfolio.
@@ -157,6 +170,10 @@ Tested and rejected (BACKTEST_RESULTS.md, runs 4–5, 9–10):
 - Backtesting: IBKR historical bars.
 - Paper trading: 15-minute delayed data is treated as real-time for now, on all timeframes. Intraday signals will fire about 15 minutes late, which is acceptable for testing.
 - Before trading live: subscribe to real-time US stock data in IBKR.
+
+## 12a. Costs for a small account
+- Live trading starts with about $10k, so a 5% position is about $500. Use IBKR **Tiered** pricing: its minimum is about $0.35 per order, vs $1 on Fixed. In the backtest, Fixed's minimum cost 3–6 points of CAGR a year at $10k, Tiered about 1 (BACKTEST_RESULTS.md run 15).
+- At $10k, about a fifth of the symbols cost more than $500 a share and can't be bought at 5% without fractional shares; whole-share rounding leaves the others about 18% under size. Check whether IBKR's API accepts fractional quantities with the stop orders before relying on it.
 
 ## 13. Validation plan
 1. Backtest the touch signal (sections 3–4) across all 60 MA/timeframe combinations on the universe, with and without the index filter.

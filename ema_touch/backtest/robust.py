@@ -20,11 +20,16 @@ import pandas as pd
 
 from ema_touch.backtest.portfolio import UNIVERSES, WINDOWS, avg_exposure, simulate_portfolio, stats
 from ema_touch.backtest.run import RESULTS_DIR, add_trend
-from ema_touch.bot.params import DEFAULT
+from ema_touch.bot.params import DEFAULT, TIMEFRAMES
 
-TRADES = {"run8_exits": "exit_half3R_trail", "run10_exits": "default"}
+TRADES = {"run8_exits": "exit_half3R_trail", "run10_exits": "exit_next_bar",  # next-bar entry everywhere
+          "touch_1d_1w": "exit_touch_1d_1w", "touch_1d": "exit_touch_1d", "current": "default",
+          **{f"exit_{v}": f"exit_{v}" for v in ("base", "be_05R", "be_1R", "be_2R", "be_3R", "be_off",
+                                                 "p25_2R", "be_1R_p25_2R")}}
+# Rules use the current defaults, so earlier rounds rerun today trade only Params.timeframes
 RULES = {
     "default": DEFAULT,
+    "all_timeframes": replace(DEFAULT, timeframes=tuple(TIMEFRAMES)),
     "no_leveraged_etfs": replace(DEFAULT, leverage_above=99.0),
     "no_margin": replace(DEFAULT, max_gross=1.0),
     "strict": replace(DEFAULT, adding_rule="strict", max_lots=1),
@@ -33,6 +38,8 @@ RULES = {
     "no_ema10_20": replace(DEFAULT, entry_periods=(50, 100, 200)),
     "quality_first_no_lev": replace(DEFAULT, signal_priority="quality", leverage_above=99.0),
     "quality_first_no_margin": replace(DEFAULT, signal_priority="quality", max_gross=1.0),
+    "10k_fixed": replace(DEFAULT, start_equity=10_000.0, commission_min=1.0),   # IBKR Fixed: $1 minimum per order
+    "10k_tiered": replace(DEFAULT, start_equity=10_000.0, commission_min=0.35),  # IBKR Tiered: ~$0.35 minimum
 }
 TRENDS = ["off", "above_200", "rising_200"]
 
@@ -60,6 +67,38 @@ EXPERIMENTS = {
     "run10, 75% subsets, quality first": ("run10_exits", "all", "quality_first", "off", 0.75),
     "run10, all, quality first, no lev": ("run10_exits", "all", "quality_first_no_lev", "off", 1.0),
     "run10, all, quality first, no margin": ("run10_exits", "all", "quality_first_no_margin", "off", 1.0),
+    # Round 3: entry on the touch itself (sell at the close if it didn't hold) vs the next bar
+    "entry next bar": ("run10_exits", "all", "default", "off", 1.0),
+    "entry touch 1d+1w": ("touch_1d_1w", "all", "default", "off", 1.0),
+    "entry touch 1d": ("touch_1d", "all", "default", "off", 1.0),
+    "entry next bar, 75% subsets": ("run10_exits", "all", "default", "off", 0.75),
+    "entry touch 1d, 75% subsets": ("touch_1d", "all", "default", "off", 0.75),
+    # Round 4: trade only 1d and 1w (touch entry on both)
+    "all timeframes": ("touch_1d_1w", "all", "all_timeframes", "off", 1.0),
+    "1d+1w": ("touch_1d_1w", "all", "default", "off", 1.0),
+    "1d+1w, no leveraged ETFs": ("touch_1d_1w", "all", "no_leveraged_etfs", "off", 1.0),
+    "1d+1w, no margin": ("touch_1d_1w", "all", "no_margin", "off", 1.0),
+    "1d+1w, original 34": ("touch_1d_1w", "original", "default", "off", 1.0),
+    "1d+1w, 75% subsets": ("touch_1d_1w", "all", "default", "off", 0.75),
+    "1d+1w, strict": ("touch_1d_1w", "all", "strict", "off", 1.0),
+    "all timeframes, original 34": ("touch_1d_1w", "original", "all_timeframes", "off", 1.0),
+    "1d+1w next-bar entry, original 34": ("run10_exits", "original", "default", "off", 1.0),
+    "1d+1w next-bar entry": ("run10_exits", "all", "default", "off", 1.0),
+    "1d touch + 1w next-bar": ("touch_1d", "all", "default", "off", 1.0),
+    "1d touch + 1w next-bar, original 34": ("touch_1d", "original", "default", "off", 1.0),
+    "1d touch + 1w next-bar, 75% subsets": ("touch_1d", "all", "default", "off", 0.75),
+    # Round 5: 56 steady large caps added (current default trades)
+    "all 152": ("current", "all", "default", "off", 1.0),
+    "previous 96": ("current", "previous", "default", "off", 1.0),
+    "steady 56 only": ("current", "steady", "default", "off", 1.0),
+    "original 34": ("current", "original", "default", "off", 1.0),
+    "all 152, 75% subsets": ("current", "all", "default", "off", 0.75),
+    "all 152, no margin": ("current", "all", "no_margin", "off", 1.0),
+    # Round 6: later breakeven / partial profit (previous 96), at $1M with % costs and at $10k with
+    # IBKR's minimum commission per order
+    **{f"{v}{label}": (f"exit_{v}", "previous", rules, "off", 1.0)
+       for v in ("base", "be_05R", "be_1R", "be_2R", "be_3R", "be_off", "p25_2R", "be_1R_p25_2R")
+       for label, rules in ((", $1M", "default"), (", $10k fixed", "10k_fixed"), (", $10k tiered", "10k_tiered"))},
 }
 
 _trades: dict[str, pd.DataFrame] = {}
@@ -102,8 +141,11 @@ def main():
     parser.add_argument("--seeds", type=int, default=20)
     parser.add_argument("--workers", type=int, default=12)
     parser.add_argument("--only", nargs="*", default=list(EXPERIMENTS))
+    parser.add_argument("--match", help="run the experiments whose name contains this text")
     parser.add_argument("--out", default="robust_runs", help="results/<out>.csv")
     args = parser.parse_args()
+    if args.match:
+        args.only = [e for e in EXPERIMENTS if args.match in e]
     jobs = [(exp, seed) for exp in args.only for seed in range(args.seeds)]
     with Pool(args.workers, initializer=_init) as pool:
         runs = pd.DataFrame([row for rows in pool.imap_unordered(_one, jobs) for row in rows])

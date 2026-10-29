@@ -9,6 +9,8 @@ Simplifications:
   underlying's return over the same holding period (daily-reset decay and the 15-day cap are ignored).
 - Leveraged ETFs are assumed available over the whole history, though most single-stock ones launched in 2022-2024.
 - Position size uses realized equity; the daily equity curve marks open positions to market on daily closes.
+- With Params.commission_min, each order (entry, partial, exit) costs at least that many dollars; position
+  dollars are not rounded to whole shares.
 
 Usage:
     python -m ema_touch.backtest.portfolio            # uses results/break1.5_trades.parquet
@@ -21,7 +23,7 @@ import pandas as pd
 
 from common.data import load
 from common.reference import load_reference
-from common.universe import ALL_SYMBOLS, INDEXES, STOCKS
+from common.universe import ALL_SYMBOLS, INDEXES, PREVIOUS_SYMBOLS, STEADY_STOCKS, STOCKS
 from ema_touch.backtest.run import RESULTS_DIR
 from ema_touch.bot.params import DEFAULT, TIMEFRAMES, Params
 from ema_touch.bot.rules import entry_allowed, position_size
@@ -38,7 +40,7 @@ def stop_level(pos: dict, t) -> float:
 def risk_and_locked(pos: dict, t) -> tuple[float, float]:
     """Dollars lost if the stop is hit (open risk), and dollars kept if it is (locked profit)."""
     level = stop_level(pos, t)
-    remaining = 0.5 if pd.notna(pos["partial_time"]) and pos["partial_time"] <= t else 1.0
+    remaining = 1 - pos["partial_fraction"] if pd.notna(pos["partial_time"]) and pos["partial_time"] <= t else 1.0
     exposure = pos["dollars"] * pos["factor"] * remaining
     return exposure * max(0.0, 1 - level), exposure * max(0.0, level - 1)
 
@@ -57,7 +59,8 @@ def simulate_portfolio(trades: pd.DataFrame, start, p: Params = DEFAULT,
     """With seed, signals arriving at the same time are taken in a random symbol order instead of
     the data's order (a robustness check: which symbol gets the capital first is arbitrary)."""
     leveraged = {u: v["factor"] for u, v in load_reference()["leveraged"].items()}
-    c = trades[entry_allowed(trades, p) & (trades.time >= start) & trades.period.isin(p.entry_periods)].copy()
+    c = trades[entry_allowed(trades, p) & (trades.time >= start) & trades.period.isin(p.entry_periods)
+               & trades.tf.isin(p.timeframes)].copy()
     c["size"] = position_size(c, p)
     c["ret"] = c.r * c.risk_pct  # net return on the underlying
     c["tf_rank"] = c.tf.map({tf: i for i, tf in enumerate(TIMEFRAMES)})
@@ -71,7 +74,8 @@ def simulate_portfolio(trades: pd.DataFrame, start, p: Params = DEFAULT,
     ascending = [k in ("time", "order") for k in keys]
     c = c.sort_values(keys, ascending=ascending, kind="stable")
 
-    realized = START_EQUITY
+    realized = p.start_equity
+    has_fraction = "partial_fraction" in c  # trades simulated before ladder partials sold half
     open_pos: list[dict] = []
     log = []
     for row in c.itertuples():
@@ -102,25 +106,30 @@ def simulate_portfolio(trades: pd.DataFrame, start, p: Params = DEFAULT,
         factor = 1.0
         if gross + dollars > p.leverage_above * realized and row.symbol in leveraged and row.tf not in p.no_leverage_tfs:
             factor = leveraged[row.symbol]
+        pnl = dollars * factor * row.ret
+        if p.commission_min:
+            # replace the percentage commission in ret with per-order commissions of at least commission_min
+            orders = 2 + pd.notna(row.partial_time)
+            pnl += 2 * p.commission_pct * dollars * factor - orders * max(p.commission_min, p.commission_pct * dollars)
         pos = {
             **decision, "action": "add" if lots else "enter", "size": row.size, "dollars": dollars,
             "factor": factor, "entry": row.entry, "entry_time": row.entry_time, "exit_time": row.exit_time,
             "be_time": row.be_time, "partial_time": row.partial_time,
+            "partial_fraction": row.partial_fraction if has_fraction else 0.5,
             "stop_times": np.asarray(row.stop_times), "stop_levels": np.asarray(row.stop_levels),
-            "r": row.r, "pnl": dollars * factor * row.ret,
-            "margin": gross + dollars > p.leverage_above * realized,
+            "r": row.r, "pnl": pnl, "margin": gross + dollars > p.leverage_above * realized,
         }
         open_pos.append(pos)
         log.append(pos)
     log = pd.DataFrame(log).drop(columns=["stop_times", "stop_levels"], errors="ignore")
-    return log, equity_curve(log[log.action.isin(["enter", "add"])], start)
+    return log, equity_curve(log[log.action.isin(["enter", "add"])], start, p.start_equity)
 
 
-def equity_curve(positions: pd.DataFrame, start) -> pd.Series:
+def equity_curve(positions: pd.DataFrame, start, start_equity: float = START_EQUITY) -> pd.Series:
     """Daily equity: realized P&L plus open positions marked to market on daily closes."""
     days = load("SPY", "1d").index
     days = days[days >= start]
-    equity = pd.Series(START_EQUITY, index=days)
+    equity = pd.Series(start_equity, index=days)
     closes = {s: load(s, "1d")["close"].reindex(days).ffill() for s in positions.symbol.unique()}
     for pos in positions.itertuples():
         exit_day = days.searchsorted(pos.exit_time)  # first day at/after exit
@@ -164,7 +173,7 @@ def report(log: pd.DataFrame, equity: pd.Series, label: str) -> None:
           f"on margin: {pos['margin'].mean():.0%}, leveraged ETF: {(pos.factor > 1).mean():.0%}")
     print("By timeframe:", pos.groupby("tf").size().reindex(TIMEFRAMES).fillna(0).astype(int).to_dict())
     yearly = pd.DataFrame({
-        "strategy": equity.resample("YE").last().pct_change().fillna(equity.resample("YE").last().iloc[0] / START_EQUITY - 1),
+        "strategy": equity.resample("YE").last().pct_change().fillna(equity.resample("YE").last().iloc[0] / equity.iloc[0] - 1),
         "SPY": spy.resample("YE").last().pct_change().fillna(spy.resample("YE").last().iloc[0] / spy.iloc[0] - 1),
     })
     yearly.index = yearly.index.year
@@ -179,7 +188,8 @@ VARIANTS = {
     "no_margin": replace(DEFAULT, max_gross=1.0),
 }
 WINDOWS = {"full": "2007-01-01", "since2022": "2022-01-01", "last2y": "2024-11-01"}
-UNIVERSES = {"all": ALL_SYMBOLS, "original": INDEXES + STOCKS}
+UNIVERSES = {"all": ALL_SYMBOLS, "original": INDEXES + STOCKS, "previous": PREVIOUS_SYMBOLS,
+             "steady": STEADY_STOCKS}
 
 
 def main():

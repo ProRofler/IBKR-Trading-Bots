@@ -1,0 +1,33 @@
+
+===== full =====
+                          CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                         
+all timeframes               0.291        0.307     0.320        -0.326       -0.359          1.276     1.087    20
+1d+1w                        0.293        0.307     0.321        -0.318       -0.350          1.300     1.053    20
+1d+1w, no leveraged ETFs     0.261        0.272     0.282        -0.275       -0.318          1.279     0.957    20
+1d+1w, no margin             0.147        0.161     0.168        -0.139       -0.205          1.226     0.556    20
+1d+1w, original 34           0.145        0.151     0.160        -0.264       -0.311          0.911     0.904    20
+1d+1w, 75% subsets           0.278        0.300     0.326        -0.317       -0.376          1.286     1.031    20
+1d+1w, strict                0.041        0.053     0.059        -0.079       -0.098          0.954     0.195    20
+
+===== since2022 =====
+                          CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                         
+all timeframes               0.338        0.456     0.518        -0.272       -0.317          1.449     1.142    20
+1d+1w                        0.438        0.470     0.505        -0.248       -0.283          1.560     1.031    20
+1d+1w, no leveraged ETFs     0.369        0.397     0.421        -0.216       -0.235          1.539     0.935    20
+1d+1w, no margin             0.171        0.196     0.223        -0.125       -0.150          1.311     0.542    20
+1d+1w, original 34           0.020        0.030     0.036        -0.256       -0.268          0.274     0.837    20
+1d+1w, 75% subsets           0.422        0.493     0.568        -0.251       -0.287          1.576     1.029    20
+1d+1w, strict                0.012        0.029     0.055        -0.072       -0.085          0.575     0.151    20
+
+===== last2y =====
+                          CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                         
+all timeframes               0.394        0.477     0.600        -0.213       -0.259          1.562     1.011    20
+1d+1w                        0.337        0.436     0.536        -0.214       -0.250          1.455     0.913    20
+1d+1w, no leveraged ETFs     0.301        0.395     0.445        -0.212       -0.235          1.435     0.848    20
+1d+1w, no margin             0.187        0.245     0.302        -0.102       -0.150          1.536     0.507    20
+1d+1w, original 34           0.078        0.097     0.117        -0.092       -0.113          0.756     0.867    20
+1d+1w, 75% subsets           0.236        0.465     0.580        -0.250       -0.314          1.479     0.884    20
+1d+1w, strict               -0.005        0.016     0.055        -0.047       -0.058          0.363     0.160    20

@@ -9,10 +9,14 @@ Exit for the part left after the partial target (Params.trail_mode):
 - "band":       close below MA - band_k * ATR (the touch band)
 - "chandelier": stop trails at highest high since entry - trail_atr * ATR, checked intrabar
 
-On Params.ladder_tfs the EMA ladder replaces all of that (no partial target): when a bar closes above
+On Params.ladder_tfs the EMA ladder replaces all of that (no partial target unless
+Params.ladder_partial_r): when a bar closes above
 a shorter EMA than the current support, that EMA becomes the support and the stop moves to
 EMA - ladder_wiggle_atr * ATR, updated every bar and never lowered. The entry EMA itself only acts as
 support once the stop has reached breakeven.
+
+Params.entry_mode "touch" buys on the touch bar itself (see bot.signals.find_touch_signals) and sells at
+its close if the touch didn't hold; the close stands in for the check shortly before the close.
 """
 import pandas as pd
 
@@ -45,36 +49,64 @@ def simulate(df: pd.DataFrame, signals: pd.DataFrame, kind: str, period: int, p:
     else:
         close_exit = None
     n = len(df)
+    touch = p.entry_mode == "touch"
 
     trades = []
     busy_until = -1  # one open trade per symbol/MA/timeframe at a time
     for sig in signals.itertuples():
         i = sig.i
-        if i <= busy_until or i + 1 >= n:
-            continue
-        limit = c[i] + p.entry_offset_atr * atr[i]
-        j = i + 1
-        if o[j] <= limit:
-            entry = o[j]
-        elif l[j] <= limit:
-            entry = limit
+        if touch:
+            # Filled on the touch bar itself; its low and close aren't known yet when the order rests
+            if i <= busy_until:
+                continue
+            j = i
+            stop = sig.ma - p.stop_ma_atr * sig.atr
+            if o[j] <= stop:
+                continue  # opened below the stop: the bracket would exit at once
+            entry = min(o[j], sig.level)
+            risk_atr = sig.atr
         else:
-            continue  # gapped above the limit: signal expires
-        stop = min(ma[i] - p.stop_ma_atr * atr[i], l[i] - p.stop_low_atr * atr[i])
+            if i <= busy_until or i + 1 >= n:
+                continue
+            limit = c[i] + p.entry_offset_atr * atr[i]
+            j = i + 1
+            if o[j] <= limit:
+                entry = o[j]
+            elif l[j] <= limit:
+                entry = limit
+            else:
+                continue  # gapped above the limit: signal expires
+            stop = min(ma[i] - p.stop_ma_atr * atr[i], l[i] - p.stop_low_atr * atr[i])
+            risk_atr = atr[i]
         risk = entry - stop
-        if risk < p.min_risk_atr * atr[i]:
+        if risk < p.min_risk_atr * risk_atr:
             continue  # gapped down to just above the stop: R would be meaningless
-        target = entry + p.target_r * risk
-        be_trigger = entry * (1 + p.breakeven_pct)
+        target_r, target_fraction = (p.ladder_partial_r, p.ladder_partial_fraction) if ladder else (p.target_r, p.target_fraction)
+        target = entry + target_r * risk
+        be_trigger = entry + p.breakeven_r * risk if p.breakeven_r else entry * (1 + p.breakeven_pct)
 
-        remaining, realized_r, hit_1r, be_k, partial_done = 1.0, 0.0, False, None, ladder
+        partial_done = ladder and not p.ladder_partial_r
+        remaining, realized_r, hit_1r, be_k = 1.0, 0.0, False, None
         partial_k = None
         peak = entry
         support = period  # current ladder rung (EMA period)
         # stop history as (time it takes effect, stop / entry), for the portfolio's risk accounting
         stop_times, stop_levels = [df.index[i].value], [stop / entry]
         exit_reason, k = "open", j
-        for k in range(j, n):
+        first = j
+        if touch:
+            # The touch bar after the fill: its high may have come before the fill, so only the stop and
+            # the close count
+            first = j + 1
+            if l[j] <= stop:
+                realized_r, remaining, exit_reason = (stop - entry) / risk, 0.0, "stop"
+            elif not sig.held:
+                realized_r, remaining, exit_reason = (c[j] - entry) / risk, 0.0, "not_held"
+            elif c[j] >= be_trigger:
+                stop, be_k = entry, j
+                stop_times.append(df.index[j].value)
+                stop_levels.append(1.0)
+        for k in range(first, n if remaining > 0 else first):
             if o[k] <= stop and k > j:
                 realized_r += remaining * (o[k] - entry) / risk
                 exit_reason = _stop_label(stop, entry) + "_gap"
@@ -90,8 +122,8 @@ def simulate(df: pd.DataFrame, signals: pd.DataFrame, kind: str, period: int, p:
                 hit_1r = True
             if not partial_done and h[k] >= target:
                 fill = max(target, o[k]) if k > j else target
-                realized_r += p.target_fraction * (fill - entry) / risk
-                remaining -= p.target_fraction
+                realized_r += target_fraction * (fill - entry) / risk
+                remaining -= target_fraction
                 partial_done = True
                 partial_k = k
                 if remaining <= 1e-9:
@@ -139,7 +171,8 @@ def simulate(df: pd.DataFrame, signals: pd.DataFrame, kind: str, period: int, p:
             "hit_1r": hit_1r, "exit_reason": exit_reason, "bars_held": k - j + 1,
             # when the stop reached entry (position out of risk), NaT if it never did
             "be_time": df.index[be_k] if be_k is not None else pd.NaT,
-            "took_partial": partial_done and not ladder,
+            "took_partial": partial_k is not None,
+            "partial_fraction": target_fraction if partial_k is not None else 0.0,
             "partial_time": df.index[partial_k] if partial_k is not None else pd.NaT,
             "stop_times": stop_times, "stop_levels": stop_levels,
             "final_support": support if ladder else None,

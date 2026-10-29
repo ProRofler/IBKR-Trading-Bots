@@ -41,22 +41,26 @@ def metrics(t: pd.DataFrame) -> pd.Series:
 
 
 def run(p: Params, exit_variants: dict[str, Params] | None = None) -> pd.DataFrame | dict[str, pd.DataFrame]:
-    """Simulate every signal. With exit_variants, signals are found once using p and each variant's
-    exit rules are simulated on them; returns {variant name: trades}."""
+    """Simulate every signal. With exit_variants, signals are found once per entry mode using p's
+    signal settings and each variant's rules are simulated on them; returns {variant name: trades}."""
     variants = exit_variants or {"": p}
     collected = {name: [] for name in variants}
     for symbol in ALL_SYMBOLS:
-        for tf in TIMEFRAMES:
+        for tf in p.timeframes:
             if not cache_path(symbol, tf).exists():
                 print(f"missing data: {symbol} {tf}")
                 continue
             df = load(symbol, tf)
             for kind in MA_TYPES:
                 for period in ENTRY_PERIODS:
-                    sig = find_touch_signals(df, kind, period, p)
-                    if sig.empty:
-                        continue
+                    signals = {}  # entry mode -> signals (the touch entry finds a different set)
                     for name, vp in variants.items():
+                        mode = vp.for_tf(tf).entry_mode
+                        if mode not in signals:
+                            signals[mode] = find_touch_signals(df, kind, period, replace(p, entry_mode=mode))
+                        sig = signals[mode]
+                        if sig.empty:
+                            continue
                         trades = simulate(df, sig, kind, period, vp, tf)
                         if trades.empty:
                             continue
@@ -94,7 +98,7 @@ def report(trades: pd.DataFrame, name: str) -> None:
     print(pd.DataFrame({"all signals": metrics(trades), "entry rules on": metrics(filtered)}).T)
 
     print("\n=== By timeframe (entry rules on) ===")
-    print(filtered.groupby("tf").apply(metrics, include_groups=False).reindex(TIMEFRAMES))
+    print(filtered.groupby("tf").apply(metrics, include_groups=False).reindex([tf for tf in TIMEFRAMES if tf in set(trades.tf)]))
 
     print("\n=== Each SPY counter-signal: avg R when active vs not (all signals) ===")
     rows = {}

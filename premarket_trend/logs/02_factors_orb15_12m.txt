@@ -1,0 +1,63 @@
+Rule orb15_or: {'entry': 'orb', 'or_bars': 3, 'stop': 'or'}  stocks, 2025-11-17 -> 2026-10-28, 135 symbols, 31303 stock-days
+
+== All stock-days by trend relative to the trade
+           signals  fill%  net_R    t  net_bp  win%
+trend_rel                                          
+against      16324   61.0 -0.021 -2.2    -2.3  45.0
+none         29958   61.0 -0.036 -5.0    -4.1  44.0
+with         16324   60.0 -0.050 -5.3    -5.5  44.0
+
+== By pre-market gap in the trade's direction (ATRs)
+           signals  fill%  net_R    t  net_bp  win%
+pm_gap                                             
+<-1            905   60.0  0.009  0.3    -7.0  49.0
+-1..-0.3      9292   61.0  0.010  0.8     4.7  46.0
+-0.3..0.3    39998   61.0 -0.045 -7.3    -5.8  44.0
+0.3..1        9292   59.0 -0.042 -3.2    -5.4  44.0
+1..2           693   51.0 -0.005 -0.1     7.8  48.0
+>2             212   51.0  0.118  1.6    71.7  53.0
+
+== By pre-market relative volume
+      signals  fill%  net_R    t  net_bp  win%
+rvol                                          
+<1      44456   61.0 -0.043 -7.3    -5.5  44.0
+1-2     11716   60.0 -0.030 -2.7    -3.2  45.0
+2-4      4060   59.0  0.001  0.0     3.2  49.0
+4-8      1256   58.0 -0.032 -1.0     2.2  46.0
+>8       1118   54.0  0.078  2.3    20.3  50.0
+
+== Gap with the trade >= 0.3 ATR: relative volume x trend
+                signals  fill%  net_R    t  net_bp  win%
+rvol trend_rel                                          
+<1   against       1321   61.0 -0.043 -1.2    -5.3  42.0
+     none          2576   62.0  0.002  0.1    -1.6  45.0
+     with          1246   59.0 -0.097 -2.7   -12.7  39.0
+1-2  against        766   59.0 -0.027 -0.7    -5.3  46.0
+     none          1380   57.0 -0.076 -2.3   -11.5  43.0
+     with           704   57.0 -0.018 -0.4     4.4  46.0
+2-4  against        341   53.0 -0.129 -2.1   -13.3  44.0
+     none           564   52.0 -0.053 -1.0    -5.1  47.0
+     with           355   57.0  0.015  0.2    13.1  49.0
+4-8  against        133   59.0  0.059  0.6    67.9  50.0
+     none           186   53.0 -0.096 -1.0   -12.6  42.0
+     with           134   60.0 -0.117 -1.3   -18.6  39.0
+>8   against        142   50.0  0.054  0.5    11.5  45.0
+     none           215   53.0  0.033  0.5    26.6  52.0
+     with           134   43.0  0.107  1.1    31.5  53.0
+
+== Gap with the trade >= 0.3 ATR and relative volume >= 2: by side and trend
+                 signals  fill%  net_R    t  net_bp  win%
+side  trend_rel                                          
+long  against        366   55.0 -0.055 -0.9     7.8  44.0
+      none           569   52.0 -0.036 -0.7    14.1  48.0
+      with           350   52.0 -0.056 -0.9    -1.7  45.0
+short against        250   51.0 -0.030 -0.4    16.6  48.0
+      none           396   53.0 -0.051 -0.9   -18.5  47.0
+      with           273   57.0  0.064  0.8    21.0  50.0
+
+== Same, by half-year (with trend only)
+        signals  fill%  net_R    t  net_bp  win%
+half                                            
+2025H2       46   67.0 -0.248 -1.9   -29.9  39.0
+2026H1      400   54.0  0.032  0.5    10.3  46.0
+2026H2      177   53.0  0.005  0.1    17.8  52.0

@@ -1,0 +1,21 @@
+
+===== full =====
+                                     CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                    
+1d touch + 1w next-bar                  0.235        0.261     0.271        -0.374       -0.441          1.139     0.971    20
+1d touch + 1w next-bar, original 34     0.115        0.126     0.142        -0.287       -0.302          0.785     0.837    20
+1d touch + 1w next-bar, 75% subsets     0.227        0.249     0.284        -0.333       -0.413          1.112     0.953    20
+
+===== since2022 =====
+                                     CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                    
+1d touch + 1w next-bar                  0.448        0.467     0.523        -0.301       -0.323          1.520     0.951    20
+1d touch + 1w next-bar, original 34     0.105        0.110     0.116        -0.288       -0.302          0.622     0.923    20
+1d touch + 1w next-bar, 75% subsets     0.456        0.495     0.543        -0.276       -0.308          1.554     0.966    20
+
+===== last2y =====
+                                     CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                    
+1d touch + 1w next-bar                  0.405        0.453     0.502        -0.231       -0.279          1.486     0.820    20
+1d touch + 1w next-bar, original 34     0.093        0.100     0.134        -0.153       -0.163          0.699     0.801    20
+1d touch + 1w next-bar, 75% subsets     0.273        0.403     0.599        -0.242       -0.303          1.398     0.855    20

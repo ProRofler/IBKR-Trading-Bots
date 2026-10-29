@@ -1,0 +1,51 @@
+=== Exit variants (entry rules on, after costs) ===
+                trades  win_rate  avg_r  avg_r_cap10  avg_ret  profit_factor  median_bars  kept_of_peak  reached_be  total_r_cap10
+base         55484.000     0.196  0.143        0.115    0.007          1.417        3.000         0.398       0.704       6359.058
+be_05R       52897.000     0.227  0.178        0.143    0.010          1.464        4.000         0.410       0.647       7561.794
+be_1R        48299.000     0.297  0.236        0.194    0.013          1.481        6.000         0.415       0.513       9355.261
+be_2R        45163.000     0.341  0.288        0.239    0.016          1.490        8.000         0.420       0.379      10784.594
+be_3R        43483.000     0.322  0.320        0.266    0.018          1.511        8.000         0.451       0.332      11564.536
+be_off       23368.000     0.316  4.522        0.264    0.343          8.871        7.000         0.378       0.311       6174.767
+p25_2R       55484.000     0.217  0.124        0.112    0.006          1.367        3.000         0.439       0.704       6190.006
+p25_3R       55484.000     0.199  0.130        0.117    0.006          1.382        3.000         0.460       0.704       6467.274
+p33_2R       55484.000     0.217  0.118        0.109    0.006          1.350        3.000         0.450       0.704       6049.795
+be_1R_p25_2R 48299.000     0.325  0.205        0.186    0.011          1.423        6.000         0.448       0.513       8999.551
+
+=== Avg R (cap 10) by timeframe ===
+tf            30m  1h  4h    1d    1w
+base          NaN NaN NaN 0.098 0.205
+be_05R        NaN NaN NaN 0.110 0.349
+be_1R         NaN NaN NaN 0.151 0.474
+be_2R         NaN NaN NaN 0.186 0.591
+be_3R         NaN NaN NaN 0.204 0.690
+be_off        NaN NaN NaN 0.173 0.866
+p25_2R        NaN NaN NaN 0.096 0.196
+p25_3R        NaN NaN NaN 0.100 0.202
+p33_2R        NaN NaN NaN 0.093 0.192
+be_1R_p25_2R  NaN NaN NaN 0.146 0.448
+
+=== Avg return per trade by timeframe ===
+tf            30m  1h  4h     1d      1w
+base          NaN NaN NaN  0.39%   2.45%
+be_05R        NaN NaN NaN  0.48%   4.33%
+be_1R         NaN NaN NaN  0.63%   5.68%
+be_2R         NaN NaN NaN  0.77%   7.12%
+be_3R         NaN NaN NaN  0.85%   8.35%
+be_off        NaN NaN NaN 20.47% 125.34%
+p25_2R        NaN NaN NaN  0.34%   2.08%
+p25_3R        NaN NaN NaN  0.36%   2.16%
+p33_2R        NaN NaN NaN  0.33%   1.96%
+be_1R_p25_2R  NaN NaN NaN  0.55%   4.94%
+
+=== Trades by timeframe ===
+tf            30m  1h  4h       1d      1w
+base          NaN NaN NaN  46681.0  8803.0
+be_05R        NaN NaN NaN  45521.0  7376.0
+be_1R         NaN NaN NaN  41852.0  6447.0
+be_2R         NaN NaN NaN  39266.0  5897.0
+be_3R         NaN NaN NaN  37950.0  5533.0
+be_off        NaN NaN NaN  20283.0  3085.0
+p25_2R        NaN NaN NaN  46681.0  8803.0
+p25_3R        NaN NaN NaN  46681.0  8803.0
+p33_2R        NaN NaN NaN  46681.0  8803.0
+be_1R_p25_2R  NaN NaN NaN  41852.0  6447.0

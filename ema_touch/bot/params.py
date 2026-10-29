@@ -1,7 +1,7 @@
 """Strategy parameters. Values mirror STRATEGY.md; [proposed] ones are the defaults under review."""
 from dataclasses import dataclass, field, replace
 
-TIMEFRAMES = ["30m", "1h", "4h", "1d", "1w"]
+TIMEFRAMES = ["30m", "1h", "4h", "1d", "1w"]  # all the backtest supports; Params.timeframes are traded
 MA_TYPES = ["EMA"]  # EMA only (user decision 2026-10-28); "SMA" is still supported by bot.indicators.ma
 MA_PERIODS = [5, 10, 20, 50, 100, 200]
 ENTRY_PERIODS = [10, 20, 50, 100, 200]  # EMAs that can be entry points (5 dropped 2026-10-28)
@@ -21,12 +21,18 @@ class Params:
     min_hold_ratio: float = 0.0    # with reset_on_break=False: held / (held + breaks) in the lookback
 
     # Entry (section 7)
+    # "next_bar": after the touch bar closes and held, limit buy at its close + entry_offset_atr * ATR,
+    # valid one bar. "touch": resting limit at the top of the band (previous bar's MA + band_k * ATR)
+    # fills on the touch itself, with the stop at MA - stop_ma_atr * ATR; if the bar then closes below
+    # the band (not held), sell at the close.
+    entry_mode: str = "next_bar"
     entry_offset_atr: float = 0.1  # limit = touch-bar close + offset * ATR, valid one bar
 
     # Exits (section 8)
     stop_ma_atr: float = 1.0       # stop candidate: MA - stop_ma_atr * ATR
     stop_low_atr: float = 0.25     # stop candidate: touch-bar low - stop_low_atr * ATR
     breakeven_pct: float = 0.01    # move stop to entry once price is +1%
+    breakeven_r: float = 0.0       # if > 0: move it once price is entry + breakeven_r * R instead
     target_r: float = 3.0          # sell the first half at this R multiple (3R beat 2R, backtest 2026-10-28)
     target_fraction: float = 0.5   # 1.0 = sell everything at the target
     trail_mode: str = "break"      # exit for the rest: "break", "band" or "chandelier" (see backtest/simulate.py)
@@ -36,18 +42,27 @@ class Params:
     ladder_tfs: tuple = ("4h", "1d", "1w")
     ladder_wiggle_atr: float = 1.0   # best of 0-1 ATR on 4h, 1d and 1w (run 10)
     ladder_min_period: int = 20      # shortest EMA the stop may climb to; 20 beat 10 on 4h, 1d and 1w (run 10)
+    ladder_partial_r: float = 0.0    # if > 0: on ladder timeframes, sell ladder_partial_fraction at this R
+    ladder_partial_fraction: float = 0.25
     lock_at_r: float = 0.0         # profit lock: once price reaches entry + lock_at_r * R (0 = off) ...
     lock_to_r: float = 0.0         # ... move the stop to entry + lock_to_r * R
     min_risk_atr: float = 0.5      # skip entries whose stop is closer than this (after a gap down)
     # Per-timeframe exit settings that replace the ones above (best tested per timeframe, runs 9-10)
     tf_overrides: dict = field(default_factory=lambda: {
         "30m": {"target_r": 4.0, "target_fraction": 1.0},  # sell everything at 4R
+        # buy on the touch, sell at the close if it didn't hold (adopted 2026-10-29, run 12); 1w keeps
+        # the next-bar entry: its touch entry was much worse on the original 34 since 2022 (run 13)
+        "1d": {"entry_mode": "touch"},
     })
 
     # Trading costs per side, as a fraction of price (backtest only).
     # Percent-based because historical prices are split-adjusted, which distorts per-share fees.
     commission_pct: float = 0.0001  # ~IBKR fixed $0.005/share on a $50 stock
     slippage_pct: float = 0.0003
+    # Portfolio replay only: minimum commission per order in dollars (IBKR Fixed $1, Tiered ~$0.35;
+    # 0 = percentage only) and the starting balance it applies to
+    commission_min: float = 0.0
+    start_equity: float = 1_000_000.0
 
     # Index counter-signals (section 4.2), evaluated on daily bars.
     # stretched, below_200 and big_drop are still computed but don't block (backtest 2026-10-28).
@@ -78,6 +93,8 @@ class Params:
     signal_priority: str = "quality"  # adopted 2026-10-28: higher median and far narrower range (run 11)
     # EMAs that may open positions in the portfolio (signals on others are ignored)
     entry_periods: tuple = (10, 20, 50, 100, 200)
+    # Timeframes that are simulated and traded (30m/1h/4h dropped 2026-10-29, run 13)
+    timeframes: tuple = ("1d", "1w")
 
     # Sizing (section 6), as a fraction of equity
     size_base: float = 0.05

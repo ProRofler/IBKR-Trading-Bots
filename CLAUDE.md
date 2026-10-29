@@ -17,6 +17,7 @@ Python trading bots for Interactive Brokers TWS, using `ib_async` (maintained fo
   - `config.py`, `connection.py`: TWS settings and the paper-only connect.
 - `data/`: cached bars, `<SYMBOL>_<tf>.parquet` for 30m, 1h, 4h, 1d, 1w. History requested (`common.data.REQUESTS`): 1d/1w 20 years, 4h 5 years, 1h 4 years, 30m 2 years; younger symbols have less.
 - `ema_touch/`: the EMA touch strategy (spec, backtests, results). See `ema_touch/CLAUDE.md`.
+- `intraday_reversal/`, `premarket_trend/`: day-trading strategies and research, **abandoned 2026-10-29**. Kept for reference only; see their `RESEARCH.md` for what was tested.
 - `tools/`: `smoke_test.py` (read-only: account, positions, quote, bars) and `test_order.py` (places a 1-share AAPL buy limit at 50% of last close, then cancels it). Run with `-m tools.smoke_test`.
 
 ## Adding a strategy
@@ -30,6 +31,8 @@ Python trading bots for Interactive Brokers TWS, using `ib_async` (maintained fo
 - `python -m common.reference` refreshes sectors and leveraged ETFs.
 - IBKR history quirks handled in `common/data.py`: zero-volume filler bars during trading halts are dropped, and `universe.HISTORY_START` cuts pre-SPAC-merger / pre-relisting history. Check new symbols for both.
 - Error 162 "HMDS query returned no data" for young symbols on long durations is harmless; what exists is saved.
+- Known issue, not fixed: IBKR's first hourly bar of the day is 9:30–10:00, but `_normalize` stamps it 10:30 (start + 1 hour). Signals on it come 30 minutes late, never early. Fixing it would change `ema_touch` 1h results.
+- Halts can leave intraday bars at odd times (e.g. 12:05). Code that expects fixed bar times should drop them.
 
 ## IBKR notes
 - No paid market data subscription: use `ib.reqMarketDataType(3)` (delayed, ~15 min lag). Historical bars work.
