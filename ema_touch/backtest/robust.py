@@ -25,7 +25,10 @@ from ema_touch.bot.params import DEFAULT, TIMEFRAMES
 TRADES = {"run8_exits": "exit_half3R_trail", "run10_exits": "exit_next_bar",  # next-bar entry everywhere
           "touch_1d_1w": "exit_touch_1d_1w", "touch_1d": "exit_touch_1d", "current": "default",
           **{f"exit_{v}": f"exit_{v}" for v in ("base", "be_05R", "be_1R", "be_2R", "be_3R", "be_off",
-                                                 "p25_2R", "be_1R_p25_2R")}}
+                                                 "p25_2R", "be_1R_p25_2R",
+                                                 "be_intraday_path", "be_intraday_path_same_day",
+                                                 "be_intraday_worst", "be_intraday_worst_same_day",
+                                                 "be_intraday_1R_same_day", "be_intraday_2R_same_day")}}
 # Rules use the current defaults, so earlier rounds rerun today trade only Params.timeframes
 RULES = {
     "default": DEFAULT,
@@ -135,6 +138,11 @@ EXPERIMENTS = {
     "spy: 10/20%, SPY core 10%, no lev ETFs": ("current", "previous", "s10_20_core_no_lev", "off", 1.0),
     "spy: 10/20%, only while a SPY trade is open": ("current", "previous", "s10_20_gate", "off", 1.0),
     "spy: 5/10%, SPY core 10%": ("current", "previous", "s5_10_core", "off", 1.0),
+    # Round 9: stop to breakeven during the session instead of at the close ($10k Tiered, 10% / 20%,
+    # previous 96)
+    **{f"be: {v}": (f"exit_{v}", "previous", "10k_tiered", "off", 1.0)
+       for v in ("base", "be_intraday_path", "be_intraday_path_same_day", "be_intraday_worst",
+                 "be_intraday_worst_same_day", "be_intraday_1R_same_day", "be_intraday_2R_same_day")},
 }
 
 _trades: dict[str, pd.DataFrame] = {}

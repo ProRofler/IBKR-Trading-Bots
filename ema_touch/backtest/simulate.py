@@ -91,14 +91,38 @@ def simulate(df: pd.DataFrame, signals: pd.DataFrame, kind: str, period: int, p:
         peak = entry
         support = period  # current ladder rung (EMA period)
         # stop history as (time it takes effect, stop / entry), for the portfolio's risk accounting
-        stop_times, stop_levels = [df.index[i].value], [stop / entry]
+        # (touch entries start from the signal time, the previous bar's end; earlier lookups use the first
+        # level anyway)
+        stop_times, stop_levels = [df.index[i - 1 if touch else i].value], [stop / entry]
         exit_reason, k = "open", j
         first = j
+        intraday = p.breakeven_intraday != "off"
+
+        def be_stamp(bar: int) -> int:
+            # when the breakeven counts for the portfolio's risk accounting: from the bar's start (the
+            # previous bar's end) or its end
+            return max(df.index[bar - 1 if p.breakeven_frees_same_bar else bar].value, stop_times[-1])
+
         if touch:
             # The touch bar after the fill: its high may have come before the fill, so only the stop and
-            # the close count
+            # the close count, unless the high clearly came after the fill (intraday breakeven)
             first = j + 1
-            if l[j] <= stop:
+            high_after_fill = intraday and h[j] >= be_trigger and (c[j] >= o[j] or o[j] <= sig.level)
+            if high_after_fill and c[j] < o[j]:
+                # filled at the open, then open-high-low-close: breakeven before the low
+                stop, be_k = entry, j
+                stop_times.append(be_stamp(j))
+                stop_levels.append(1.0)
+                if l[j] <= entry:
+                    remaining, exit_reason = 0.0, "breakeven"
+            elif high_after_fill and l[j] > stop:
+                # open-low-high-close: filled on the way down, breakeven on the way up, then the close
+                stop, be_k = entry, j
+                stop_times.append(be_stamp(j))
+                stop_levels.append(1.0)
+                if c[j] <= entry:
+                    remaining, exit_reason = 0.0, "breakeven"
+            elif l[j] <= stop:
                 realized_r, remaining, exit_reason = (stop - entry) / risk, 0.0, "stop"
             elif not sig.held:
                 realized_r, remaining, exit_reason = (c[j] - entry) / risk, 0.0, "not_held"
@@ -112,6 +136,18 @@ def simulate(df: pd.DataFrame, signals: pd.DataFrame, kind: str, period: int, p:
                 exit_reason = _stop_label(stop, entry) + "_gap"
                 remaining = 0.0
                 break
+            if intraday and stop < entry and h[k] >= be_trigger:
+                high_first = o[k] >= be_trigger or (p.breakeven_intraday == "path" and c[k] < o[k])
+                if high_first or l[k] > stop:
+                    stop, be_k = entry, k
+                    stop_times.append(be_stamp(k))
+                    stop_levels.append(1.0)
+                    # after the trigger, price came back to entry: the low if the high came first, else
+                    # the close ("worst" always assumes the low came after)
+                    back = l[k] if high_first or p.breakeven_intraday == "worst" else c[k]
+                    if back <= entry:
+                        exit_reason, remaining = "breakeven", 0.0
+                        break
             if l[k] <= stop:
                 realized_r += remaining * (stop - entry) / risk
                 exit_reason = _stop_label(stop, entry)

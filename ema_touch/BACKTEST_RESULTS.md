@@ -1,5 +1,36 @@
 # Backtest results (2026-10-28)
 
+## Run 18: stop to breakeven during the session (2026-10-30)
+
+Current rule: if a day's high reaches +1% over the entry, the stop moves to entry at the close, effective the next day, and the position counts as out of risk for the adding rule from that close. Tested: move the stop during the session the moment price reaches +1% (an IBKR adjustable stop does this server-side), optionally with the freed risk allowing new entries the same day. Daily bars don't show whether the high or the low came first, so two assumptions (`Params.breakeven_intraday`): "path" (open-low-high-close on up days, open-high-low-close on down days) and "worst" (a stop hit counts first; after the trigger, any low back at entry exits). `Params.breakeven_frees_same_bar` lets the freed risk count for the same day's entries. Also intraday at +1R and +2R. `python -m ema_touch.backtest.exits` (round 9, `logs/exits9.txt`), `python -m ema_touch.backtest.robust --match "be: "` (round 9, `logs/robust9.txt`). Portfolio at $10k Tiered, 10% / 20% sizing, previous 96.
+
+**Per trade (all symbols, 1d + 1w)**
+
+| Breakeven | Win rate | Avg R (cap 10) | Return per trade | 1w trades ending at +3R or more |
+|---|---|---|---|---|
+| **At the close (current)** | 19.6% | **0.115** | 0.7% | 4.6% |
+| During the session at +1%, "path" | 12.2% | −0.001 | 0.0% | 0.1% |
+| During the session at +1%, "worst" | 12.2% | −0.007 | 0.0% | |
+| During the session at +1R | 27.3% | 0.138 | 1.0% | |
+| During the session at +2R | 33.8% | 0.230 | 1.5% | |
+
+**Portfolio, 20 replays each: median CAGR / median max DD / median Sharpe**
+
+| Breakeven | 2007–2026 | 2022–2026 | Last 2 years |
+|---|---|---|---|
+| **At the close (current)** | **25.5% / −32% / 1.08** | **38.5% / −29% / 1.26** | **50.4% / −22% / 1.59** |
+| Session +1%, "path", room from the next day | −2.8% / −50% | −3.7% | 2.5% |
+| Session +1%, "path", room the same day | 4.6% / −45% / 0.33 | 10.9% | 14.0% |
+| Session +1%, "worst", room the same day | 2.1% / −52% | 7.5% | 8.9% |
+| Session +1R, room the same day | 20.1% / −41% / 0.86 | 33.7% / −33% | 40.0% / −25% |
+| Session +2R, room the same day | 17.2% / −44% / 0.80 | 35.3% / −28% | 28.6% / −25% |
+
+**Findings**
+- **+1% is inside a normal day's range.** With the stop at entry during the session, 38% of trades reach +1% and fall back to entry the same day, so they are scratched before they can become trend winners. Weekly trades suffer most: a week almost always moves 1% both ways. The two high/low-order assumptions give the same answer, so this isn't an artifact of daily bars.
+- Letting the freed risk allow same-day entries helps, but nowhere near enough to make up for it.
+- A bigger intraday trigger (+1R, +2R) keeps the edge per trade (higher win rate, as in run 15), but the portfolio is worse than now: positions stay at risk longer, so the adding rule blocks new entries.
+- **Kept: breakeven after the close.** The live bot checks the day's high after the close and moves the stop for the next session.
+
 ## Run 17: 10% / 20% positions with a 10% SPY floor (2026-10-30)
 
 Proposal: positions of 10% of equity (20% with SPY confluence; per-symbol cap stays 20%), and always hold at least 10% of equity in SPY before buying anything else. Modeled as a permanent SPY core (`Params.spy_core = 0.10`): 10% of realized equity in SPY from day one, rebalanced daily (rebalancing commissions ignored), counted toward the 2× margin cap. Also tested the stricter reading (`Params.spy_gate`): other symbols are entered only while the strategy itself holds a SPY trade. All at $10k with Tiered commissions, previous 96 symbols. `python -m ema_touch.backtest.robust --match "spy:"` (round 8, `results/robust_runs_round8.csv`, `logs/robust8.txt`).

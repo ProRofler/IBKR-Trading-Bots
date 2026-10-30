@@ -1,0 +1,39 @@
+=== Exit variants (entry rules on, after costs) ===
+                              trades  win_rate  avg_r  avg_r_cap10  avg_ret  profit_factor  median_bars  kept_of_peak  reached_be  total_r_cap10
+base                       55484.000     0.196  0.143        0.115    0.007          1.417        3.000         0.398       0.704       6359.058
+be_intraday_path           60831.000     0.122  0.013       -0.001    0.000          1.045        2.000         0.397       0.730        -64.955
+be_intraday_path_same_day  60831.000     0.122  0.013       -0.001    0.000          1.045        2.000         0.397       0.730        -64.955
+be_intraday_worst          60831.000     0.122  0.007       -0.007   -0.000          1.024        2.000         0.397       0.724       -411.469
+be_intraday_worst_same_day 60831.000     0.122  0.007       -0.007   -0.000          1.024        2.000         0.397       0.724       -411.469
+be_intraday_1R_same_day    49416.000     0.273  0.171        0.138    0.010          1.355        6.000         0.418       0.520       6822.543
+be_intraday_2R_same_day    45243.000     0.338  0.276        0.230    0.015          1.471        8.000         0.423       0.381      10403.006
+
+=== Avg R (cap 10) by timeframe ===
+tf                          30m  1h  4h    1d     1w
+base                        NaN NaN NaN 0.098  0.205
+be_intraday_path            NaN NaN NaN 0.022 -0.107
+be_intraday_path_same_day   NaN NaN NaN 0.022 -0.107
+be_intraday_worst           NaN NaN NaN 0.020 -0.128
+be_intraday_worst_same_day  NaN NaN NaN 0.020 -0.128
+be_intraday_1R_same_day     NaN NaN NaN 0.112  0.301
+be_intraday_2R_same_day     NaN NaN NaN 0.181  0.555
+
+=== Avg return per trade by timeframe ===
+tf                          30m  1h  4h    1d     1w
+base                        NaN NaN NaN 0.39%  2.45%
+be_intraday_path            NaN NaN NaN 0.15% -0.60%
+be_intraday_path_same_day   NaN NaN NaN 0.15% -0.60%
+be_intraday_worst           NaN NaN NaN 0.15% -0.73%
+be_intraday_worst_same_day  NaN NaN NaN 0.15% -0.73%
+be_intraday_1R_same_day     NaN NaN NaN 0.52%  3.91%
+be_intraday_2R_same_day     NaN NaN NaN 0.75%  6.76%
+
+=== Trades by timeframe ===
+tf                          30m  1h  4h       1d       1w
+base                        NaN NaN NaN  46681.0   8803.0
+be_intraday_path            NaN NaN NaN  49852.0  10979.0
+be_intraday_path_same_day   NaN NaN NaN  49852.0  10979.0
+be_intraday_worst           NaN NaN NaN  49852.0  10979.0
+be_intraday_worst_same_day  NaN NaN NaN  49852.0  10979.0
+be_intraday_1R_same_day     NaN NaN NaN  42609.0   6807.0
+be_intraday_2R_same_day     NaN NaN NaN  39321.0   5922.0

@@ -33,6 +33,15 @@ class Params:
     stop_low_atr: float = 0.25     # stop candidate: touch-bar low - stop_low_atr * ATR
     breakeven_pct: float = 0.01    # move stop to entry once price is +1%
     breakeven_r: float = 0.0       # if > 0: move it once price is entry + breakeven_r * R instead
+    # When the stop moves to breakeven. "off": at the close of the bar whose high reached the trigger
+    # (effective next bar). "path": during the bar, as an IBKR adjustable stop would; daily bars don't
+    # show whether the high or low came first, so assume open-low-high-close on up bars and
+    # open-high-low-close on down bars. "worst": during the bar, a stop hit counts before the trigger,
+    # and after the trigger any low back at entry exits at breakeven.
+    breakeven_intraday: str = "off"
+    # Portfolio: True = a breakeven reached during a bar frees room for new entries that same bar;
+    # False = from the next bar (as when the move is only known at the close)
+    breakeven_frees_same_bar: bool = False
     target_r: float = 3.0          # sell the first half at this R multiple (3R beat 2R, backtest 2026-10-28)
     target_fraction: float = 0.5   # 1.0 = sell everything at the target
     trail_mode: str = "break"      # exit for the rest: "break", "band" or "chandelier" (see backtest/simulate.py)

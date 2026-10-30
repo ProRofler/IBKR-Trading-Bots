@@ -107,7 +107,8 @@ Dropped after the backtest of 2026-10-28 (see BACKTEST_RESULTS.md), because they
 All exit orders are sent to TWS as a **bracket** together with the entry, so IBKR holds them even if the bot is offline.
 
 - **Initial stop:** the lower of (MA − 1 × ATR) and (touch-bar low − 0.25 × ATR). With the touch entry (1d): the previous day's MA − 1 × ATR, since the touch bar's low isn't known at entry.
-- **Breakeven:** at +1% profit, move the stop to the entry price
+- **Breakeven:** if the day's high reached +1% over the entry, move the stop to the entry price **after the close** (effective the next session). The position counts as out of risk for the adding rule (section 9) from then on.
+  - Not during the session (run 18): +1% is well inside a day's range, so an intraday breakeven stop gets hit the same day on about 38% of trades and the edge disappears.
 - R = entry − initial stop. Each timeframe uses the best exit tested for it (BACKTEST_RESULTS.md, runs 9–10).
 
 | Timeframe | Take profit |
@@ -137,6 +138,7 @@ Tested and rejected (BACKTEST_RESULTS.md, runs 4–5, 9–10):
 - Wiggle 0–0.5 ATR, and the 5 or 10 EMA as the lowest ladder rung.
 - They keep more of each winner's peak but cut the big runners short, which earn most of the profit.
 - Breakeven later than +1% (at +0.5R to +3R, or never) and selling 25–33% at +2R/+3R (run 15). A later breakeven raises the win rate (20% → 34% at +2R) and the edge per trade, but positions stay at risk longer, the adding rule (section 9) blocks new entries, and the portfolio does much worse over the last 2 years. The +1% breakeven is what keeps the risk budget free. Expect a win rate around 20%.
+- Breakeven during the session (IBKR adjustable stop) at +1%, +1R or +2R, with the freed risk allowing new entries the same day (run 18). At +1% the strategy loses money; at +1R / +2R it gives 17–20% CAGR since 2007 vs 25.5%, with deeper drawdowns.
 
 ## 9. Rule for adding positions
 - Each position's stop moves to entry once that position is +1% (section 8). The +1% is measured on the position, not the portfolio.

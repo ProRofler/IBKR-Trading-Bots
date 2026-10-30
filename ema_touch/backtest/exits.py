@@ -75,7 +75,7 @@ ROUND_7 = {
 }
 # Round 8 (1d/1w only): a higher win rate by moving the stop to breakeven later, or by selling part of
 # the position at a target while the rest stays on the EMA ladder
-VARIANTS = {
+ROUND_8 = {
     "base": DEFAULT,
     "be_05R": replace(DEFAULT, breakeven_r=0.5),
     "be_1R": replace(DEFAULT, breakeven_r=1.0),
@@ -86,6 +86,19 @@ VARIANTS = {
     "p25_3R": replace(DEFAULT, ladder_partial_r=3.0),
     "p33_2R": replace(DEFAULT, ladder_partial_r=2.0, ladder_partial_fraction=1 / 3),
     "be_1R_p25_2R": replace(DEFAULT, breakeven_r=1.0, ladder_partial_r=2.0),
+}
+# Round 9: stop to breakeven during the session once price is +1% (IBKR adjustable stop), instead of
+# at the close. "path"/"worst" are the two assumptions about the order of the day's high and low.
+# The *_same_day variants differ only in the portfolio: the freed risk allows entries the same day.
+VARIANTS = {
+    "base": DEFAULT,
+    "be_intraday_path": replace(DEFAULT, breakeven_intraday="path"),
+    "be_intraday_path_same_day": replace(DEFAULT, breakeven_intraday="path", breakeven_frees_same_bar=True),
+    "be_intraday_worst": replace(DEFAULT, breakeven_intraday="worst"),
+    "be_intraday_worst_same_day": replace(DEFAULT, breakeven_intraday="worst", breakeven_frees_same_bar=True),
+    # a trigger beyond a day's noise
+    "be_intraday_1R_same_day": replace(DEFAULT, breakeven_intraday="path", breakeven_frees_same_bar=True, breakeven_r=1.0),
+    "be_intraday_2R_same_day": replace(DEFAULT, breakeven_intraday="path", breakeven_frees_same_bar=True, breakeven_r=2.0),
 }
 
 
