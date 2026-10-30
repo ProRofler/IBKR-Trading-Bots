@@ -1,5 +1,46 @@
 # Backtest results (2026-10-28)
 
+## Run 17: 10% / 20% positions with a 10% SPY floor (2026-10-30)
+
+Proposal: positions of 10% of equity (20% with SPY confluence; per-symbol cap stays 20%), and always hold at least 10% of equity in SPY before buying anything else. Modeled as a permanent SPY core (`Params.spy_core = 0.10`): 10% of realized equity in SPY from day one, rebalanced daily (rebalancing commissions ignored), counted toward the 2× margin cap. Also tested the stricter reading (`Params.spy_gate`): other symbols are entered only while the strategy itself holds a SPY trade. All at $10k with Tiered commissions, previous 96 symbols. `python -m ema_touch.backtest.robust --match "spy:"` (round 8, `results/robust_runs_round8.csv`, `logs/robust8.txt`).
+
+**Portfolio, 20 replays each: median CAGR (10th–90th percentile) / median max DD (worst) / median Sharpe**
+
+| Setup | 2007–2026 | 2022–2026 | Last 2 years |
+|---|---|---|---|
+| Current: 5% / 10%, no floor | 23.8% (23–26) / −38% (−43%) / 1.07 | **46.5%** / −29% / 1.50 | 46.6% / −23% / 1.49 |
+| 10% / 20%, no floor | **25.5%** (22–28) / −32% (−40%) / 1.08 | 38.5% / −29% / 1.26 | **50.4%** / −22% / 1.59 |
+| **Proposal:** 10% / 20%, 10% SPY core | 25.0% (23–28) / −32% (−41%) / 1.05 | 39.7% / −28% / 1.27 | 49.1% / −22% / 1.55 |
+| 10% / 20%, 10% SPY core, no lev ETFs | 24.5% (21–27) / **−32% (−37%)** / 1.10 | 39.8% / −25% / 1.35 | 44.1% / −21% / 1.49 |
+| 10% / 20%, only while a SPY trade is open | 13.5% / −35% / 0.78 | 19.0% / −33% / 0.91 | 20.5% / −34% / 0.91 |
+| 5% / 10%, 10% SPY core | 23.8% / −40% / 1.06 | 44.4% / −30% / 1.46 | 48.2% / −23% / 1.54 |
+
+**Findings**
+- **The SPY core changes almost nothing** (within ±1.5 points of the same sizing without it, everywhere). A 10% SPY sleeve earns about 1% of equity a year, but it also takes 10% of the 2× margin budget, and signals are often refused because the cap is reached (skip_margin is the most common decision), so in busy periods it replaces strategy positions with SPY.
+- **10% / 20% sizing:** since 2007 slightly more return (25.5% vs 23.8%) with clearly smaller drawdowns (−32% vs −38%), but since 2022 clearly worse (38–40% vs 46.5%) and a wider spread between replays. Sharpe is about the same overall. Unlike run 16's 20% / 30%, it does not make results noticeably more luck-dependent since 2007.
+- **Gating entries on the strategy's own SPY trade halves the return:** SPY is in a trade only part of the time, so most signals are skipped.
+
+## Run 16: bigger positions, sized on 2× equity (2026-10-30)
+
+Proposal: treat the account as twice its size (`Params.sizing_base = 2`), size positions at 10% of that (15% with SPY confluence), i.e. 20% / 30% of equity; allow up to 3× equity in positions and switch to leveraged ETFs above 2×. The per-symbol cap (20%) also applies to 2× equity. All at $10k with Tiered commissions, previous 96 symbols, run 13 rules. `python -m ema_touch.backtest.robust --match "size:"` (round 7, `results/robust_runs_round7.csv`).
+
+**Portfolio, 20 replays each: median CAGR (10th–90th percentile) / median max DD (worst) / median Sharpe**
+
+| Setup | 2007–2026 | 2022–2026 | Last 2 years |
+|---|---|---|---|
+| Current: 5% / 10% of equity, 2× cap, lev ETFs above 1× | 23.8% (23–26) / −38% (−43%) / 1.07 | 46.5% / −29% / 1.50 | 46.6% / −23% / 1.49 |
+| **Proposal:** 20% / 30% of equity, 3× cap, lev ETFs above 2× | **35.1%** (29–38) / −43% (−50%) / 1.09 | 55.1% / −36% (−45%) / 1.32 | 66.7% / −24% / 1.56 |
+| 20% / 30%, 3× cap, no lev ETFs | 33.4% (29–38) / −43% (−49%) / 1.11 | **60.6%** / −30% / 1.47 | 63.8% / −23% / 1.56 |
+| 20% / 30%, 2× cap, lev ETFs above 1× | 22.9% (20–27) / −42% (−50%) / 0.95 | 37.7% / −36% (−57%) / 1.17 | 45.8% / −20% / 1.42 |
+| 20% / 30%, 2× cap, no lev ETFs | 26.1% (19–33) / −40% / 1.06 | 35.9% / −34% / 1.20 | 53.3% / −19% / 1.64 |
+| 20% / 30%, no margin | 13.0% / −32% / 0.85 | 21.6% / −23% / 1.12 | 27.1% / −16% / 1.39 |
+
+**Findings**
+- **Bigger positions alone don't help.** At the same 2× cap they give about the same or less (22.9–26.1% vs 23.8% since 2007) with deeper drawdowns and a much wider range between replays: fewer, larger positions make results depend more on which signals happened to get the capital.
+- **The gain comes from the 3× cap** (33–35% vs 24% since 2007). Sharpe stays the same (1.07 → 1.09–1.11): it is more leverage, not more edge, with drawdowns of −43% (worst −50%). Leveraged ETFs above 2× add little over plain 3× (35.1% vs 33.4%, and worse since 2022).
+- **A $10k Reg T margin account can't hold 3× overnight:** the initial margin for stocks held overnight is 50%, i.e. 2× (4× intraday only for pattern day traders with $25k+). Higher leverage needs a portfolio margin account (minimum $110k at IBKR) or leveraged ETFs, and IBKR charges leveraged ETFs higher margin. Margin calls and forced liquidation are not modeled; at 3× a −43% drawdown would likely have triggered them.
+- One real benefit of bigger positions at $10k: a 20% position is $2,000, so every one of the 96 symbols can be bought in whole shares, and the $0.35 minimum commission matters less.
+
 ## Run 15: higher win rate (later breakeven, partial profit) and small-account commissions (2026-10-30)
 
 Run 13 rules on the previous 96 symbols. Variants (`Params.breakeven_r`, `Params.ladder_partial_r` / `ladder_partial_fraction`): stop to breakeven at +0.5R / +1R / +2R / +3R / never (instead of +1%), and selling 25% at +2R with the rest on the EMA ladder. Cost models (`Params.start_equity`, `Params.commission_min`): $1M with percentage costs as before, and $10k with a minimum commission per order of $1 (IBKR Fixed) or $0.35 (IBKR Tiered, approximate). Run with `python -m ema_touch.backtest.exits` (round 8) and `python -m ema_touch.backtest.robust --match '$'` (round 6, `results/robust_runs_round6.csv`).

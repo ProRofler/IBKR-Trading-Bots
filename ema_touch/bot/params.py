@@ -96,9 +96,16 @@ class Params:
     # Timeframes that are simulated and traded (30m/1h/4h dropped 2026-10-29, run 13)
     timeframes: tuple = ("1d", "1w")
 
-    # Sizing (section 6), as a fraction of equity
-    size_base: float = 0.05
-    size_confluence: float = 0.10
+    # Sizing (section 6), as a fraction of equity (10% / 20% adopted 2026-10-30, run 17; was 5% / 10%)
+    size_base: float = 0.10
+    size_confluence: float = 0.20
+    # Sizes and the per-symbol cap are fractions of sizing_base x equity (2.0 = treat $10k as $20k)
+    sizing_base: float = 1.0
+    # SPY floor (portfolio replay only). spy_core: hold SPY at this fraction of equity at all times
+    # (rebalanced daily, counts toward max_gross). spy_gate: enter other symbols only while the
+    # strategy's own SPY lots are at least this fraction of equity. 0 = off.
+    spy_core: float = 0.0
+    spy_gate: float = 0.0
 
     # Adding rule (section 9)
     # "strict": every open position at breakeven; "count": up to max_at_risk positions below breakeven;

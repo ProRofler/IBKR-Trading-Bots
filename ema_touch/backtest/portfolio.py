@@ -1,6 +1,6 @@
 """Phase-2 backtest: replay phase-1 trades through the portfolio rules.
 
-Rules applied (STRATEGY.md): entry filter (4.3), sizing 5%/10% (6), one position per symbol with the
+Rules applied (STRATEGY.md): entry filter (4.3), sizing 10%/20% (6), one position per symbol with the
 highest timeframe winning ties (7), the adding rule: every open position must already be at breakeven (9),
 margin up to max_gross x equity with 2x leveraged ETFs preferred above 100% (5.2).
 
@@ -78,20 +78,50 @@ def simulate_portfolio(trades: pd.DataFrame, start, p: Params = DEFAULT,
     has_fraction = "partial_fraction" in c  # trades simulated before ladder partials sold half
     open_pos: list[dict] = []
     log = []
-    for row in c.itertuples():
-        t = row.time
+    # SPY core: daily P&L of spy_core x realized equity, booked at each daily close
+    spy = load("SPY", "1d")["close"]
+    spy = spy[spy.index >= start]
+    core_pnl = pd.Series(0.0, index=spy.index)
+    core_day = 1  # next day whose return is booked
+    if p.spy_core and p.commission_min:
+        realized -= p.commission_min  # one buy; rebalancing trades are ignored
+
+    def advance(t):
+        """Book exits and SPY core returns up to time t, in time order."""
+        nonlocal realized, core_day
+        while p.spy_core and core_day < len(spy) and spy.index[core_day] <= t:
+            day = spy.index[core_day]
+            for pos in [pos for pos in open_pos if pos["exit_time"] <= day]:
+                realized += pos["pnl"]
+                open_pos.remove(pos)
+            pnl = p.spy_core * max(realized, 0) * (spy.iloc[core_day] / spy.iloc[core_day - 1] - 1)
+            realized += pnl
+            core_pnl.iloc[core_day] = pnl
+            core_day += 1
         for pos in [pos for pos in open_pos if pos["exit_time"] <= t]:
             realized += pos["pnl"]
             open_pos.remove(pos)
 
+    for row in c.itertuples():
+        t = row.time
+        advance(t)
+
         decision = {"time": t, "symbol": row.symbol, "tf": row.tf, "ma": f"{row.ma_type}{row.period}"}
-        dollars = row.size * realized
+        if realized <= 0:
+            log.append({**decision, "action": "skip_ruined"})
+            continue
+        if p.spy_gate and row.symbol != "SPY":
+            spy_held = sum(pos["dollars"] for pos in open_pos if pos["symbol"] == "SPY")
+            if spy_held < p.spy_gate * realized:
+                log.append({**decision, "action": "skip_no_spy"})
+                continue
+        dollars = row.size * p.sizing_base * realized
         lots = [pos for pos in open_pos if pos["symbol"] == row.symbol]
         if lots:
             can_add = (
                 len(lots) < p.max_lots
                 and all(stop_level(pos, t) >= 1 for pos in lots)
-                and sum(pos["dollars"] for pos in lots) + dollars <= p.max_symbol_exposure * realized
+                and sum(pos["dollars"] for pos in lots) + dollars <= p.max_symbol_exposure * p.sizing_base * realized
             )
             if not can_add:
                 log.append({**decision, "action": "skip_symbol_held"})
@@ -99,7 +129,7 @@ def simulate_portfolio(trades: pd.DataFrame, start, p: Params = DEFAULT,
         if not adding_allowed(open_pos, t, p):
             log.append({**decision, "action": "skip_adding_rule"})
             continue
-        gross = sum(pos["dollars"] for pos in open_pos)
+        gross = sum(pos["dollars"] for pos in open_pos) + p.spy_core * realized
         if gross + dollars > p.max_gross * realized:
             log.append({**decision, "action": "skip_margin"})
             continue
@@ -121,8 +151,12 @@ def simulate_portfolio(trades: pd.DataFrame, start, p: Params = DEFAULT,
         }
         open_pos.append(pos)
         log.append(pos)
+    advance(spy.index[-1])  # book the core up to the last day
     log = pd.DataFrame(log).drop(columns=["stop_times", "stop_levels"], errors="ignore")
-    return log, equity_curve(log[log.action.isin(["enter", "add"])], start, p.start_equity)
+    equity = equity_curve(log[log.action.isin(["enter", "add"])], start, p.start_equity)
+    if p.spy_core:
+        equity += core_pnl.reindex(equity.index).fillna(0).cumsum() - (p.commission_min or 0)
+    return log, equity
 
 
 def equity_curve(positions: pd.DataFrame, start, start_equity: float = START_EQUITY) -> pd.Series:
@@ -169,7 +203,7 @@ def report(log: pd.DataFrame, equity: pd.Series, label: str) -> None:
     print(f"\n##### Portfolio: {label} ({equity.index[0]:%Y-%m-%d} -> {equity.index[-1]:%Y-%m-%d}) #####")
     print(pd.DataFrame({"strategy": stats(equity), "SPY buy & hold": stats(spy)}).T.to_string(float_format=lambda x: f"{x:.3f}"))
     print("\nDecisions:", log.action.value_counts().to_dict())
-    print(f"Positions: {len(pos)}, at 10% size: {(pos['size'] > 0.05).mean():.0%}, "
+    print(f"Positions: {len(pos)}, at confluence size: {(pos['size'] > p.size_base).mean():.0%}, "
           f"on margin: {pos['margin'].mean():.0%}, leveraged ETF: {(pos.factor > 1).mean():.0%}")
     print("By timeframe:", pos.groupby("tf").size().reindex(TIMEFRAMES).fillna(0).astype(int).to_dict())
     yearly = pd.DataFrame({

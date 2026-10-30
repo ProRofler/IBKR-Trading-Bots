@@ -1,0 +1,30 @@
+
+===== full =====
+                                                   CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                                  
+size: current 5/10%                                   0.230        0.238     0.256        -0.378       -0.428          1.074     0.967    20
+size: 2x base 10/15%, 3x gross, lev ETFs above 2x     0.294        0.351     0.382        -0.433       -0.501          1.085     1.338    20
+size: 2x base 10/15%, 2x gross, lev ETFs above 1x     0.197        0.229     0.271        -0.416       -0.498          0.948     0.968    20
+size: 2x base 10/15%, 2x gross, no lev ETFs           0.194        0.261     0.325        -0.397       -0.445          1.064     0.904    20
+size: 2x base 10/15%, 3x gross, no lev ETFs           0.287        0.334     0.379        -0.426       -0.494          1.108     1.247    20
+size: 2x base 10/15%, no margin                       0.105        0.130     0.164        -0.318       -0.356          0.847     0.501    20
+
+===== since2022 =====
+                                                   CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                                  
+size: current 5/10%                                   0.411        0.465     0.497        -0.293       -0.314          1.501     0.960    20
+size: 2x base 10/15%, 3x gross, lev ETFs above 2x     0.492        0.551     0.649        -0.359       -0.454          1.319     1.295    20
+size: 2x base 10/15%, 2x gross, lev ETFs above 1x     0.250        0.377     0.453        -0.361       -0.572          1.169     1.057    20
+size: 2x base 10/15%, 2x gross, no lev ETFs           0.269        0.359     0.502        -0.343       -0.398          1.204     0.950    20
+size: 2x base 10/15%, 3x gross, no lev ETFs           0.510        0.606     0.660        -0.299       -0.393          1.467     1.204    20
+size: 2x base 10/15%, no margin                       0.175        0.216     0.299        -0.229       -0.389          1.119     0.551    20
+
+===== last2y =====
+                                                   CAGR p10  CAGR median  CAGR p90  maxDD median  maxDD worst  sharpe median  exposure  runs
+experiment                                                                                                                                  
+size: current 5/10%                                   0.413        0.466     0.502        -0.234       -0.281          1.489     0.810    20
+size: 2x base 10/15%, 3x gross, lev ETFs above 2x     0.514        0.667     0.800        -0.236       -0.331          1.562     1.176    20
+size: 2x base 10/15%, 2x gross, lev ETFs above 1x     0.366        0.458     0.640        -0.201       -0.269          1.416     0.901    20
+size: 2x base 10/15%, 2x gross, no lev ETFs           0.324        0.533     0.657        -0.189       -0.265          1.637     0.866    20
+size: 2x base 10/15%, 3x gross, no lev ETFs           0.496        0.638     0.774        -0.227       -0.340          1.561     1.131    20
+size: 2x base 10/15%, no margin                       0.150        0.271     0.374        -0.159       -0.191          1.385     0.510    20

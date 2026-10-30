@@ -15,7 +15,8 @@ def entry_allowed(signals: pd.DataFrame, p: Params = DEFAULT) -> pd.Series:
 
 
 def position_size(signals: pd.DataFrame, p: Params = DEFAULT) -> pd.Series:
-    """Fraction of equity: 10% with SPY confluence, capped at 5% by a QQQ (tech only) or DIA counter-signal."""
+    """Fraction of equity: size_confluence with SPY confluence, else (or with a QQQ (tech only) or DIA
+    counter-signal) size_base."""
     capped = signals["dia_counter"] | (signals["is_tech"] & signals["qqq_counter"])
     big = signals["spy_touch"] & ~capped
     return big.map({True: p.size_confluence, False: p.size_base})

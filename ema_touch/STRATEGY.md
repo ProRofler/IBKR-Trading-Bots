@@ -51,9 +51,9 @@ Dropped after the backtest of 2026-10-28 (see BACKTEST_RESULTS.md), because they
 
 ### 4.3 How the filter is applied
 - A counter-signal on **SPY** is a hard block: no new entries.
-- A counter-signal on **QQQ or DIA** (where checked) caps the position at 5%.
+- A counter-signal on **QQQ or DIA** (where checked) caps the position at the base size (10%).
 - **Confluence:** SPY's daily bar is touching its 20, 50, 100 or 200 MA (SMA or EMA, as in section 3.1).
-  - **1d, 1w:** confluence is optional and raises the size to 10% (section 6).
+  - **1d, 1w:** confluence is optional and raises the size to 20% (section 6).
   - (dropped) 30m and 1h required confluence: without it they lost money after costs.
 
 ## 5. Instruments
@@ -66,10 +66,10 @@ Dropped after the backtest of 2026-10-28 (see BACKTEST_RESULTS.md), because they
   - MSFT → MSFU, PLTR → PLTU, and similar single-stock leveraged ETFs
 - The underlying → leveraged ETF mapping lives in a config file. Each ticker is verified against IBKR contract details before use.
 - Signals for leveraged ETFs are calculated on the underlying (index or stock); orders are executed in the leveraged ETF.
-- Leveraged ETFs are sized like any other position: 5–10% of the portfolio in dollars, with no adjustment for leverage.
+- Leveraged ETFs are sized like any other position: 10–20% of realized equity in dollars, with no adjustment for leverage.
 
 ### 5.2 When to use leveraged ETFs
-- Up to 100% of net liquidation invested: trade the plain instrument.
+- Up to 100% of realized equity (section 6) invested: trade the plain instrument.
 - Above 100% (on margin): **prefer** the leveraged ETF of the signal's underlying when one exists. If none exists, trade the plain instrument on margin.
 - Cap: the full margin IBKR allows. Before each order the bot runs an IBKR what-if check and skips the order if it would exceed available funds.
 - Kept after the robustness test (user decision 2026-10-29): versus plain margin they add about 2–5 points of CAGR and 2–5 points of drawdown at the same Sharpe (BACKTEST_RESULTS.md, run 11).
@@ -78,8 +78,11 @@ Dropped after the backtest of 2026-10-28 (see BACKTEST_RESULTS.md), because they
 - Leveraged ETFs are not used for 1w signals, and the maximum hold is 15 trading days **[proposed]**: daily-reset products lose value over long holds in choppy markets.
 
 ## 6. Position sizing
-- Base size: **5%** of net liquidation.
-- **10%** with SPY confluence (section 4.3), unless a QQQ (tech stocks) or DIA counter-signal caps it at 5%.
+- Sizes are fractions of **realized equity**: net liquidation minus the unrealized P&L of open positions (IBKR account values `NetLiquidation` − `UnrealizedPnL`), i.e. the starting balance plus closed-trade results. Open gains or losses don't change position size until the position is closed (user decision 2026-10-30; the backtest sizes the same way).
+- Base size: **10%** of realized equity.
+- **20%** with SPY confluence (section 4.3), unless a QQQ (tech stocks) or DIA counter-signal caps it at 10%.
+- No more than 20% of realized equity in one symbol, adds included (section 9).
+- Adopted 2026-10-30 (was 5% / 10%, BACKTEST_RESULTS.md run 17): since 2007 slightly more return with smaller drawdowns (−32% vs −38%), but 2022–2026 was weaker (39% vs 47% CAGR). A permanent 10% SPY holding was tested and added nothing.
 - Size is in dollars, rounded down to whole shares.
 
 ## 7. Entry
@@ -172,8 +175,8 @@ Tested and rejected (BACKTEST_RESULTS.md, runs 4–5, 9–10):
 - Before trading live: subscribe to real-time US stock data in IBKR.
 
 ## 12a. Costs for a small account
-- Live trading starts with about $10k, so a 5% position is about $500. Use IBKR **Tiered** pricing: its minimum is about $0.35 per order, vs $1 on Fixed. In the backtest, Fixed's minimum cost 3–6 points of CAGR a year at $10k, Tiered about 1 (BACKTEST_RESULTS.md run 15).
-- At $10k, about a fifth of the symbols cost more than $500 a share and can't be bought at 5% without fractional shares; whole-share rounding leaves the others about 18% under size. Check whether IBKR's API accepts fractional quantities with the stop orders before relying on it.
+- Live trading starts with about $10k, so a 10% position is about $1,000. Use IBKR **Tiered** pricing: its minimum is about $0.35 per order, vs $1 on Fixed. In the backtest, Fixed's minimum cost 3–6 points of CAGR a year at $10k, Tiered about 1 (BACKTEST_RESULTS.md run 15).
+- At $10k, 3 of the 96 symbols (LLY, MELI, URI) cost more than $1,000 a share and can't be bought at 10% without fractional shares; whole-share rounding leaves the others about 14% under size on average. Check whether IBKR's API accepts fractional quantities with the stop orders before relying on it.
 
 ## 13. Validation plan
 1. Backtest the touch signal (sections 3–4) across all 60 MA/timeframe combinations on the universe, with and without the index filter.

@@ -40,7 +40,29 @@ RULES = {
     "quality_first_no_margin": replace(DEFAULT, signal_priority="quality", max_gross=1.0),
     "10k_fixed": replace(DEFAULT, start_equity=10_000.0, commission_min=1.0),   # IBKR Fixed: $1 minimum per order
     "10k_tiered": replace(DEFAULT, start_equity=10_000.0, commission_min=0.35),  # IBKR Tiered: ~$0.35 minimum
+    # sizing before 2026-10-30 (5% / 10%), for the rounds that compare against it
+    "10k_tiered_5_10": replace(DEFAULT, start_equity=10_000.0, commission_min=0.35, size_base=0.05, size_confluence=0.10),
 }
+# Round 7 (all at $10k, Tiered): bigger positions. Sizes are fractions of 2x equity, 10% / 15% with
+# SPY confluence (= 20% / 30% of equity), per-symbol cap 20% of 2x equity
+_TIERED = dict(start_equity=10_000.0, commission_min=0.35)
+_BIG = dict(_TIERED, sizing_base=2.0, size_base=0.10, size_confluence=0.15)
+RULES.update({
+    "big_3x_lev_above_2x": replace(DEFAULT, **_BIG, max_gross=3.0, leverage_above=2.0),  # the proposal
+    "big_2x_lev_above_1x": replace(DEFAULT, **_BIG),  # same sizes, Reg T's 2x cap as now
+    "big_2x_no_lev": replace(DEFAULT, **_BIG, leverage_above=99.0),
+    "big_1x_no_margin": replace(DEFAULT, **_BIG, max_gross=1.0),
+    "big_3x_no_lev": replace(DEFAULT, **_BIG, max_gross=3.0, leverage_above=99.0),
+})
+# Round 8 ($10k Tiered): 10% / 20% positions with a SPY floor of 10% of equity
+_SIZE_10_20 = dict(_TIERED, size_base=0.10, size_confluence=0.20)
+RULES.update({
+    "s10_20": replace(DEFAULT, **_SIZE_10_20),
+    "s10_20_core": replace(DEFAULT, **_SIZE_10_20, spy_core=0.10),
+    "s10_20_core_no_lev": replace(DEFAULT, **_SIZE_10_20, spy_core=0.10, leverage_above=99.0),
+    "s10_20_gate": replace(DEFAULT, **_SIZE_10_20, spy_gate=0.10),
+    "s5_10_core": replace(DEFAULT, **_TIERED, size_base=0.05, size_confluence=0.10, spy_core=0.10),
+})
 TRENDS = ["off", "above_200", "rising_200"]
 
 # name -> (trades, universe, rules, trend screen, symbol subset share)
@@ -99,6 +121,20 @@ EXPERIMENTS = {
     **{f"{v}{label}": (f"exit_{v}", "previous", rules, "off", 1.0)
        for v in ("base", "be_05R", "be_1R", "be_2R", "be_3R", "be_off", "p25_2R", "be_1R_p25_2R")
        for label, rules in ((", $1M", "default"), (", $10k fixed", "10k_fixed"), (", $10k tiered", "10k_tiered"))},
+    # Round 7: bigger positions (see RULES), $10k Tiered, previous 96
+    "size: current 5/10%": ("current", "previous", "10k_tiered_5_10", "off", 1.0),
+    "size: 2x base 10/15%, 3x gross, lev ETFs above 2x": ("current", "previous", "big_3x_lev_above_2x", "off", 1.0),
+    "size: 2x base 10/15%, 2x gross, lev ETFs above 1x": ("current", "previous", "big_2x_lev_above_1x", "off", 1.0),
+    "size: 2x base 10/15%, 2x gross, no lev ETFs": ("current", "previous", "big_2x_no_lev", "off", 1.0),
+    "size: 2x base 10/15%, 3x gross, no lev ETFs": ("current", "previous", "big_3x_no_lev", "off", 1.0),
+    "size: 2x base 10/15%, no margin": ("current", "previous", "big_1x_no_margin", "off", 1.0),
+    # Round 8: 10% / 20% positions and a 10% SPY floor, $10k Tiered, previous 96
+    "spy: current 5/10%": ("current", "previous", "10k_tiered_5_10", "off", 1.0),
+    "spy: 10/20%, no floor": ("current", "previous", "s10_20", "off", 1.0),
+    "spy: 10/20%, SPY core 10%": ("current", "previous", "s10_20_core", "off", 1.0),
+    "spy: 10/20%, SPY core 10%, no lev ETFs": ("current", "previous", "s10_20_core_no_lev", "off", 1.0),
+    "spy: 10/20%, only while a SPY trade is open": ("current", "previous", "s10_20_gate", "off", 1.0),
+    "spy: 5/10%, SPY core 10%": ("current", "previous", "s5_10_core", "off", 1.0),
 }
 
 _trades: dict[str, pd.DataFrame] = {}
@@ -122,7 +158,7 @@ def _one(job) -> list[dict]:
     for window, start in WINDOWS.items():
         log, equity = simulate_portfolio(trades, pd.Timestamp(start, tz="UTC"), p, seed=seed)
         rows.append({"experiment": exp, "seed": seed, "window": window, **stats(equity),
-                     "avg_exposure": avg_exposure(log, equity),
+                     "avg_exposure": avg_exposure(log, equity) + p.spy_core,
                      "positions": int(log.action.isin(["enter", "add"]).sum())})
     return rows
 
